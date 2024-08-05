@@ -1,2 +1,14 @@
 streamlit
 openai
+pandas>=2.1
+chromadb
+tiktoken
+pypdf
+langchain-openai==0.1.7  
+langchain==0.2.2
+langchain-core==0.2.4
+langchain-community
+langsmith
+langchain-groq
+langchain_chroma
+langchain_experimental

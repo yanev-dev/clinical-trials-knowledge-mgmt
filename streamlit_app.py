@@ -1,53 +1,100 @@
-import streamlit as st
-from openai import OpenAI
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-# Show title and description.
-st.title("📄 Document question answering")
-st.write(
-    "Upload a document below and ask a question about it – GPT will answer! "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
+import os
+import streamlit as st
+import pandas as pd
+
+from tempfile import NamedTemporaryFile
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_openai import ChatOpenAI
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_openai.embeddings import OpenAIEmbeddings
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate
+
+
+st.set_page_config(layout="wide",
+                   page_title="Knowledge Management",
 )
 
-# Ask user for their OpenAI API key via `st.text_input`.
-# Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
-# via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
-openai_api_key = st.text_input("OpenAI API Key", type="password")
+"""
+# Welcome to the Knowledge Management tool!
+
+Please upload trial docs to begin asking questions. 
+"""
+
+openai_api_key = st.secrets['OPENAI_KEY']
 if not openai_api_key:
     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-else:
+llm = ChatOpenAI(model="gpt-4o")
+text_splitter = SemanticChunker(
+    OpenAIEmbeddings(), breakpoint_threshold_type="standard_deviation"
+)   
 
-    # Create an OpenAI client.
-    client = OpenAI(api_key=openai_api_key)
+uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
+                                   type=["pdf",],
+                                   accept_multiple_files=True)
 
-    # Let the user upload a file via `st.file_uploader`.
-    uploaded_file = st.file_uploader(
-        "Upload a document (.txt or .md)", type=("txt", "md")
-    )
+system_prompt = (
+        """
+        You are assisting a clinical research coordinator engaged in a clinical trial for a new drug.
+        Use the following pieces of retrieved context from the trial research protocol to answer the question.
+        Cite details from the context pertaining to an answer and be very thorough.
+        If you don't know the answer, say that you don't know.
+        
+        "\n\n"
+        "{context}"
+        """
+)
 
-    # Ask the user for a question via `st.text_area`.
-    question = st.text_area(
-        "Now ask a question about the document!",
-        placeholder="Can you give me a short summary?",
-        disabled=not uploaded_file,
-    )
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+        ("human", "{input}"),
+    ]
+)
 
-    if uploaded_file and question:
+splits = []
 
-        # Process the uploaded file and question.
-        document = uploaded_file.read().decode()
-        messages = [
-            {
-                "role": "user",
-                "content": f"Here's a document: {document} \n\n---\n\n {question}",
-            }
-        ]
+with st.spinner('Retrieving...'):
+    for f in uploaded_docs:
+        loader = PyPDFLoader(os.path.join("/tmp", file))
+        docs = loader.load()
 
-        # Generate an answer using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            stream=True,
-        )
+        # split the documents into chunks
+        splits.extend(text_splitter.split_documents(docs))
 
-        # Stream the response to the app using `st.write_stream`.
-        st.write_stream(stream)
+    # create the vectorestore to use as the index
+    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+    # expose this index in a retriever interface
+    retriever = vectorstore.as_retriever()
+    # create a chain to answer questions 
+    question_answer_chain = create_stuff_documents_chain(llm, prompt)
+    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+
+# Ask the user for a question via `st.text_area`.
+question = st.text_area(
+    "Now ask a question about the documents!",
+    placeholder="Can you give me a short summary of the protocol?",
+    disabled=not uploaded_docs,
+)
+
+
+with st.form(key="uestions"):
+    question = st.text_input('Question to answer:')
+    retrieve = st.form_submit_button("Ask", type="primary")
+    if retrieve:
+        results = rag_chain.invoke({"input": question})
+        if results:
+            st.write((results['answer']))
+            st.write("Sources:")
+            for idx, item in enumerate(results['context']):
+                st.write('\nSource %s:' % str(idx+1))
+                st.write(results['context'][idx].metadata)
+                st.write(results['context'][idx].page_content)
