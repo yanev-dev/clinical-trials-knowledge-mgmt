@@ -112,10 +112,13 @@ def main():
                             st.write((results['answer']))
                             st.write("Sources:")
                             for idx, item in enumerate(results['context']):
-                                st.write('\nSource %s:' % str(idx+1))
-                                st.write(results['context'][idx].metadata)
-                                st.write(results['context'][idx].page_content)
-                                pdf_viewer(results['context'][idx].metadata['source'], pages_to_render=[results['context'][idx].metadata['page']+1], key='pdf'+str(idx))
+                                with st.expander('\nSource %s:' % str(idx+1), key='expander'+str(idx)):
+                                    st.write(results['context'][idx].metadata)
+                                    pdf_viewer(results['context'][idx].metadata['source'], width=500, height=800, pages_to_render=[results['context'][idx].metadata['page']+1], key='pdf'+str(idx))
+                                # st.write('\nSource %s:' % str(idx+1))
+                                # st.write(results['context'][idx].metadata)
+                                # st.write(results['context'][idx].page_content)
+                                # pdf_viewer(results['context'][idx].metadata['source'], pages_to_render=[results['context'][idx].metadata['page']+1], key='pdf'+str(idx))
 
 if __name__ == "__main__":
     main()
