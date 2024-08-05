@@ -32,9 +32,9 @@ Please upload trial docs to begin asking questions.
 openai_api_key = st.secrets['OPENAI_KEY']
 if not openai_api_key:
     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-llm = ChatOpenAI(model="gpt-4o")
+llm = ChatOpenAI(model="gpt-4o", openai_api_key=openai_api_key)
 text_splitter = SemanticChunker(
-    OpenAIEmbeddings(), breakpoint_threshold_type="standard_deviation"
+    OpenAIEmbeddings(openai_api_key=openai_api_key), breakpoint_threshold_type="standard_deviation"
 )   
 
 uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
@@ -71,7 +71,7 @@ with st.spinner('Retrieving...'):
         splits.extend(text_splitter.split_documents(docs))
 
     # create the vectorestore to use as the index
-    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(openai_api_key=openai_api_key))
     # expose this index in a retriever interface
     retriever = vectorstore.as_retriever()
     # create a chain to answer questions 
