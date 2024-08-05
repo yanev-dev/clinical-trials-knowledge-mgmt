@@ -12,4 +12,4 @@ langsmith
 langchain-groq
 langchain_chroma
 langchain_experimental
-protobuf==3.20.*
+protobuf==3.19.6 
