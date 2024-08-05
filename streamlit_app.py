@@ -74,7 +74,7 @@ def main():
 
         # parse the files and add to the splits collection
         for file in uploaded_docs:
-            loader = PyPDFLoader(os.path.join("/tmp", file))
+            loader = PyPDFLoader(os.path.join("/tmp", file.name))
             docs = loader.load()
             # split the documents into chunks
             splits.extend(text_splitter.split_documents(docs))
