@@ -111,8 +111,9 @@ def main():
                         if results:
                             st.write((results['answer']))
                             st.write("Sources:")
+                            tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
                             for idx, item in enumerate(results['context']):
-                                with st.expander('\nSource %s:' % str(idx+1)):
+                                with tabs_list[idx]:
                                     st.write(results['context'][idx].metadata)
                                     pdf_viewer(results['context'][idx].metadata['source'],
                                                width=500, 
