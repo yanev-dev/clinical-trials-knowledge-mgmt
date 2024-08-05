@@ -114,8 +114,10 @@ def main():
                             for idx, item in enumerate(results['context']):
                                 with st.expander('\nSource %s:' % str(idx+1)):
                                     st.write(results['context'][idx].metadata)
-                                    pdf_viewer(results['context'][idx].metadata['source'], rendering='legacy_iframe',
-                                               width=500, height=800, pages_to_render=[results['context'][idx].metadata['page']+1],
+                                    pdf_viewer(results['context'][idx].metadata['source'],
+                                               width=500, 
+                                               height=800, 
+                                               pages_to_render=[results['context'][idx].metadata['page']+1],
                                                key='pdf'+str(idx))
                                 # st.write('\nSource %s:' % str(idx+1))
                                 # st.write(results['context'][idx].metadata)
