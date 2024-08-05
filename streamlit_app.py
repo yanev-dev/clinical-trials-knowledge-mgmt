@@ -62,45 +62,50 @@ prompt = ChatPromptTemplate.from_messages(
 
 splits = []
 
-if uploaded_docs is not None:
-    # save uploaded files
-    for i in range(len(uploaded_docs)):
-        bytes_data = uploaded_docs[i].read()  # read the content of the file in binary
-        # print(uploaded_docs[i].name, bytes_data)
-        with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
-            f.write(bytes_data)  # write this content elsewhere
 
-    # parse the files and add to the splits collection
-    for file in uploaded_docs:
-        loader = PyPDFLoader(os.path.join("/tmp", file))
-        docs = loader.load()
-        # split the documents into chunks
-        splits.extend(text_splitter.split_documents(docs))
+def main():
+    if uploaded_docs is not None:
+        # save uploaded files
+        for i in range(len(uploaded_docs)):
+            bytes_data = uploaded_docs[i].read()  # read the content of the file in binary
+            # print(uploaded_docs[i].name, bytes_data)
+            with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
+                f.write(bytes_data)  # write this content elsewhere
 
-    # create the vectorestore to use as the index
-    vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-    # expose this index in a retriever interface
-    retriever = vectorstore.as_retriever()
-    # create a chain to answer questions 
-    question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+        # parse the files and add to the splits collection
+        for file in uploaded_docs:
+            loader = PyPDFLoader(os.path.join("/tmp", file))
+            docs = loader.load()
+            # split the documents into chunks
+            splits.extend(text_splitter.split_documents(docs))
 
-    # ask the user for a question via `st.text_area`.
-    question = st.text_area(
-        "Now ask a question about the documents!",
-        placeholder="Can you give me a short summary of the protocol?",
-        disabled=not uploaded_docs,
-    )
+        # create the vectorestore to use as the index
+        vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+        # expose this index in a retriever interface
+        retriever = vectorstore.as_retriever()
+        # create a chain to answer questions 
+        question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
-    with st.form(key="questions"):
-        question = st.text_input('Question to answer:')
-        retrieve = st.form_submit_button("Ask", type="primary")
-        if retrieve:
-            results = rag_chain.invoke({"input": question})
-            if results:
-                st.write((results['answer']))
-                st.write("Sources:")
-                for idx, item in enumerate(results['context']):
-                    st.write('\nSource %s:' % str(idx+1))
-                    st.write(results['context'][idx].metadata)
-                    st.write(results['context'][idx].page_content)
+        # ask the user for a question via `st.text_area`.
+        question = st.text_area(
+            "Now ask a question about the documents!",
+            placeholder="Can you give me a short summary of the protocol?",
+            disabled=not uploaded_docs,
+        )
+
+        with st.form(key="questions"):
+            question = st.text_input('Question to answer:')
+            retrieve = st.form_submit_button("Ask", type="primary")
+            if retrieve:
+                results = rag_chain.invoke({"input": question})
+                if results:
+                    st.write((results['answer']))
+                    st.write("Sources:")
+                    for idx, item in enumerate(results['context']):
+                        st.write('\nSource %s:' % str(idx+1))
+                        st.write(results['context'][idx].metadata)
+                        st.write(results['context'][idx].page_content)
+
+if __name__ == "__main__":
+    main()
