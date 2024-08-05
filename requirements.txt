@@ -12,3 +12,4 @@ langsmith
 langchain-groq
 langchain_chroma
 langchain_experimental
+pysqlite3-binary
