@@ -118,8 +118,8 @@ def main():
                                     page_num = int(results['context'][idx].metadata['page']) + 1
                                     st.write('Page number: %d' % page_num)
                                     pdf_viewer(results['context'][idx].metadata['source'],
-                                               width=750, 
-                                               height=1200, 
+                                               width=900, 
+                                               height=1400, 
                                                pages_to_render=[results['context'][idx].metadata['page']+1],
                                                key='pdf'+str(idx))
                                 # st.write('\nSource %s:' % str(idx+1))
