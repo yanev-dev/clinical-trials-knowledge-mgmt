@@ -3,9 +3,12 @@ import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import os
+import base64
+
 import streamlit as st
 import pandas as pd
 
+from streamlit_pdf_viewer import pdf_viewer
 from tempfile import NamedTemporaryFile
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_openai import ChatOpenAI
@@ -62,6 +65,12 @@ prompt = ChatPromptTemplate.from_messages(
 
 splits = []
 
+def displayPDF(file):
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
+    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
+
 
 def main():
     if uploaded_docs is not None:
@@ -106,6 +115,7 @@ def main():
                                 st.write('\nSource %s:' % str(idx+1))
                                 st.write(results['context'][idx].metadata)
                                 st.write(results['context'][idx].page_content)
+                                pdf_viewer(results['context'][idx].metadata['source'], pages_to_render=results['context'][idx].metadata['page'])
 
 if __name__ == "__main__":
     main()
