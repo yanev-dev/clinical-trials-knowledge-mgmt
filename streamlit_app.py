@@ -115,7 +115,7 @@ def main():
                                 st.write('\nSource %s:' % str(idx+1))
                                 st.write(results['context'][idx].metadata)
                                 st.write(results['context'][idx].page_content)
-                                pdf_viewer(results['context'][idx].metadata['source'], pages_to_render=[results['context'][idx].metadata['page']])
+                                pdf_viewer(results['context'][idx].metadata['source'], pages_to_render=[results['context'][idx].metadata['page']], key='pdf'+str(idx))
 
 if __name__ == "__main__":
     main()
