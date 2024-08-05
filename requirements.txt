@@ -1,4 +1,5 @@
 streamlit
+pysqlite3-binary
 openai
 pandas>=2.1
 pypdf
