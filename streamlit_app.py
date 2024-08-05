@@ -24,7 +24,7 @@ st.set_page_config(layout="wide",
 )
 
 """
-# Welcome to the Knowledge Management tool!
+# Welcome to the clinical trial knowledge management tool!
 
 Please upload trial docs to begin asking questions. 
 """
@@ -74,10 +74,11 @@ def main():
 
         # parse the files and add to the splits collection
         for file in uploaded_docs:
-            loader = PyPDFLoader(os.path.join("/tmp", file.name))
-            docs = loader.load()
-            # split the documents into chunks
-            splits.extend(text_splitter.split_documents(docs))
+            with st.spinner('Loading...'):
+                loader = PyPDFLoader(os.path.join("/tmp", file.name))
+                docs = loader.load()
+                # split the documents into chunks
+                splits.extend(text_splitter.split_documents(docs))
 
         if splits:
             # create the vectorestore to use as the index
@@ -89,24 +90,22 @@ def main():
             rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
             # ask the user for a question via `st.text_area`.
-            question = st.text_area(
-                "Now ask a question about the documents!",
-                placeholder="Can you give me a short summary of the protocol?",
-                disabled=not uploaded_docs,
-            )
+            question = st.write(
+                "Now ask a question about the documents!")
 
             with st.form(key="questions"):
                 question = st.text_input('Question to answer:')
                 retrieve = st.form_submit_button("Ask", type="primary")
                 if retrieve:
-                    results = rag_chain.invoke({"input": question})
-                    if results:
-                        st.write((results['answer']))
-                        st.write("Sources:")
-                        for idx, item in enumerate(results['context']):
-                            st.write('\nSource %s:' % str(idx+1))
-                            st.write(results['context'][idx].metadata)
-                            st.write(results['context'][idx].page_content)
+                    with st.spinner('Thinking...'):
+                        results = rag_chain.invoke({"input": question})
+                        if results:
+                            st.write((results['answer']))
+                            st.write("Sources:")
+                            for idx, item in enumerate(results['context']):
+                                st.write('\nSource %s:' % str(idx+1))
+                                st.write(results['context'][idx].metadata)
+                                st.write(results['context'][idx].page_content)
 
 if __name__ == "__main__":
     main()
