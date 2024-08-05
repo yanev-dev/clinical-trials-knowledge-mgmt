@@ -64,7 +64,7 @@ splits = []
 
 if uploaded_docs is not None:
     # parse the docs
-    for f in uploaded_docs:
+    for file in uploaded_docs:
         loader = PyPDFLoader(os.path.join("/tmp", file))
         docs = loader.load()
         # split the documents into chunks
