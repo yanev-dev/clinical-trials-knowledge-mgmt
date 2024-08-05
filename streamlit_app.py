@@ -63,7 +63,14 @@ prompt = ChatPromptTemplate.from_messages(
 splits = []
 
 if uploaded_docs is not None:
-    # parse the docs
+    # save uploaded files
+    for i in range(len(uploaded_docs)):
+        bytes_data = uploaded_docs[i].read()  # read the content of the file in binary
+        # print(uploaded_docs[i].name, bytes_data)
+        with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
+            f.write(bytes_data)  # write this content elsewhere
+
+    # parse the files and add to the splits collection
     for file in uploaded_docs:
         loader = PyPDFLoader(os.path.join("/tmp", file))
         docs = loader.load()
