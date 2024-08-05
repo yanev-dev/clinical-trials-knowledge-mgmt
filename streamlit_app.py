@@ -90,13 +90,14 @@ def main():
                 splits.extend(text_splitter.split_documents(docs))
 
         if splits:
-            # create the vectorestore to use as the index
-            vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-            # expose this index in a retriever interface
-            retriever = vectorstore.as_retriever()
-            # create a chain to answer questions 
-            question_answer_chain = create_stuff_documents_chain(llm, prompt)
-            rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+            if 'vectorstore' not in st.session_state:
+                # create the vectorestore to use as the index
+                st.session_state['vectorstore'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+                # expose this index in a retriever interface
+                retriever = st.session_state['vectorstore'].as_retriever()
+                # create a chain to answer questions 
+                question_answer_chain = create_stuff_documents_chain(llm, prompt)
+                st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
 
             # ask the user for a question via `st.text_area`.
             question = st.write(
@@ -107,7 +108,7 @@ def main():
                 retrieve = st.form_submit_button("Ask", type="primary")
                 if retrieve:
                     with st.spinner('Thinking...'):
-                        results = rag_chain.invoke({"input": question})
+                        results = st.session_state['rag_chain'].invoke({"input": question})
                         if results:
                             st.write((results['answer']))
                             st.write("Sources:")
