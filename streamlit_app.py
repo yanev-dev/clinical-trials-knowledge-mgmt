@@ -114,8 +114,8 @@ def main():
                             tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
                             for idx, item in enumerate(results['context']):
                                 with tabs_list[idx]:
-                                    st.write(results['context'][idx].metadata.source)
-                                    page_num = int(results['context'][idx].metadata.page) + 1
+                                    st.write(results['context'][idx].metadata['source'])
+                                    page_num = int(results['context'][idx].metadata['page']) + 1
                                     st.write('Page number: %d' % page_num)
                                     pdf_viewer(results['context'][idx].metadata['source'],
                                                width=500, 
