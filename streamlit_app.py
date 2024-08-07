@@ -70,6 +70,11 @@ def main():
 
     def form_upload_callback():
         with st.spinner('Processing...'):
+            # clean up the state
+            # eg del the vector store and qachain if already existing from a prior run
+            del st.session_state['vectorstore']
+            del st.session_state['rag_chain']
+
             if uploaded_docs is not None:
                 # save uploaded files to disk
                 for i in range(len(uploaded_docs)):
@@ -106,30 +111,33 @@ def main():
 
         uploader_button = st.form_submit_button(label='Process Files', type="primary", on_click=form_upload_callback)
 
-    with st.form(key="questions"):
-        question = st.write(
-            "Now ask a question about the documents!")
-        question = st.text_input('Question:')
-        retrieve = st.form_submit_button("Ask", type="primary")
-        if retrieve:
-            with st.spinner('Thinking...'):
-                results = st.session_state['rag_chain'].invoke({"input": question})
-                if results:
-                    st.write((results['answer']))
-                    st.write("Sources:")
-                    tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
-                    for idx, item in enumerate(results['context']):
-                        with tabs_list[idx]:
-                            st.write('File name: ' + results['context'][idx].metadata['source'])
-                            page_num = int(results['context'][idx].metadata['page']) + 1
-                            st.write('Page number: %d' % page_num)
-                            pdf_viewer(results['context'][idx].metadata['source'],
-                                       width=900, 
-                                       height=1400, 
-                                       pages_to_render=[results['context'][idx].metadata['page']+1],
-                                       key='pdf'+str(idx))
-        else:
-            st.write("No results found: try a different question or upload different documents!")
+
+    # check if chain is ready before letting user ask questions    
+    if 'rag_chain' in st.session_state:
+        with st.form(key="questions"):
+            question = st.write(
+                "Now ask a question about the documents!")
+            question = st.text_input('Question:')
+            retrieve = st.form_submit_button("Ask", type="primary")
+            if retrieve:
+                with st.spinner('Thinking...'):
+                    results = st.session_state['rag_chain'].invoke({"input": question})
+                    if results:
+                        st.write((results['answer']))
+                        st.write("Sources:")
+                        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
+                        for idx, item in enumerate(results['context']):
+                            with tabs_list[idx]:
+                                st.write('File name: ' + results['context'][idx].metadata['source'])
+                                page_num = int(results['context'][idx].metadata['page']) + 1
+                                st.write('Page number: %d' % page_num)
+                                pdf_viewer(results['context'][idx].metadata['source'],
+                                           width=900, 
+                                           height=1400, 
+                                           pages_to_render=[results['context'][idx].metadata['page']+1],
+                                           key='pdf'+str(idx))
+            else:
+                st.write("No results found: try a different question or upload different documents!")
 
 if __name__ == "__main__":
     main()
