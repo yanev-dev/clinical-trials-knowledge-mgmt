@@ -123,7 +123,7 @@ def main():
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
 
-                    st.write((st.session_state['results']['answer']))
+                    st.write(results['answer'])
                     st.write("Sources:")
 
                     source_selector = st.selectbox(
