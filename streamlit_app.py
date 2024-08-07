@@ -126,6 +126,14 @@ def main():
                     st.write(results['answer'])
                     st.write("Sources:")
 
+                    st.session_state['source_selector'] = st.selectbox(
+                        "Select most relevant document fragments to view.",
+                        ("1", "2", "3", "4"),
+                        index=0,
+                        placeholder="Select a source...",
+                        on_change=render_results()
+                    )
+                    
                     @st.fragment
                     def render_results(run_every=10):
                         idx = int(st.session_state['source_selector']) - 1
@@ -138,14 +146,6 @@ def main():
                                    pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                                    key='pdf'+str(idx)
                         )
-
-                    st.session_state['source_selector'] = st.selectbox(
-                        "Select most relevant document fragments to view.",
-                        ("1", "2", "3", "4"),
-                        index=0,
-                        placeholder="Select a source...",
-                        on_change=render_results()
-                    )
 
                     # if source_selector:
                     #     idx = int(source_selector) - 1
