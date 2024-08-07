@@ -124,7 +124,7 @@ def main():
                     results = st.session_state['rag_chain'].invoke({"input": question})
                     st.write(results['answer'])
         
-        with st.form(key="sources")    
+        with st.form(key="sources"):    
             st.write("Sources:")
             st.session_state['source_selector'] = 1
 
