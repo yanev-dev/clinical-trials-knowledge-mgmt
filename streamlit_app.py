@@ -124,7 +124,7 @@ def main():
                     results = st.session_state['rag_chain'].invoke({"input": question})
                     
                     @st.fragment
-                    def render_results():
+                    def render_results(run_every=5):
                         st.write((st.session_state['results']['answer']))
                         st.write("Sources:")
                         tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
@@ -137,9 +137,8 @@ def main():
                                            width=900, 
                                            height=1400, 
                                            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                                           key='pdf'+str(idx))
-                        # refresh the fragment to ensure pdf rendering is updated
-                        st.rerun(scope='fragment')
+                                           key='pdf'+str(idx),
+                                           rendering='legacy_iframe')
 
                     if results:
                         # write results to session state
