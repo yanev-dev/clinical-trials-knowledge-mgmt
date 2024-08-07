@@ -122,31 +122,32 @@ def main():
             if retrieve:
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
-
                     st.write(results['answer'])
-                    st.write("Sources:")
-                    st.session_state['source_selector'] = 1
+        
+        with st.form(key="sources")    
+            st.write("Sources:")
+            st.session_state['source_selector'] = 1
 
-                    @st.fragment
-                    def render_results(run_every=10):
-                        idx = int(st.session_state['source_selector']) - 1
-                        st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
-                        page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-                        st.write('Page number: %d' % page_num)
-                        pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                                   width=900, 
-                                   height=1400, 
-                                   pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                                   key='pdf'+str(idx)
-                        )
+            def render_source_callback():
+                idx = int(st.session_state['source_selector']) - 1
+                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                st.write('Page number: %d' % page_num)
+                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                           key='pdf'+str(idx)
+                )
 
-                    st.session_state['source_selector'] = st.selectbox(
-                        "Select most relevant document fragments to view.",
-                        ("1", "2", "3", "4"),
-                        index=0,
-                        placeholder="Select a source...",
-                        on_change=render_results()
-                    )
+            st.session_state['source_selector'] = st.selectbox(
+                "Select most relevant document fragments to view.",
+                ("1", "2", "3", "4"),
+                index=0,
+                placeholder="Select a source...",
+            )
+
+            render_source = st.form_submit_button(label='Render source', on_click=render_source_callback)
 
                     # if source_selector:
                     #     idx = int(source_selector) - 1
