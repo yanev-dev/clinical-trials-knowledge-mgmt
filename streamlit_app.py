@@ -125,6 +125,7 @@ def main():
 
                     st.write(results['answer'])
                     st.write("Sources:")
+                    st.session_state['source_selector'] = 1
 
                     @st.fragment
                     def render_results(run_every=10):
