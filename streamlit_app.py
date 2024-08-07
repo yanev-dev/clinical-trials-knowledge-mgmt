@@ -129,7 +129,7 @@ def main():
                     source_selector = st.selectbox(
                         "Select most relevant document fragments to view.",
                         ("1", "2", "3", "4"),
-                        index=0,
+                        index=None,
                         placeholder="Select a source...",
                     )
 
