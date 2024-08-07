@@ -121,8 +121,8 @@ def main():
             retrieve = st.form_submit_button("Ask", type="primary")
             if retrieve:
                 with st.spinner('Thinking...'):
-                    results = st.session_state['rag_chain'].invoke({"input": question})
-                    st.write(results['answer'])
+                    st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
+                    st.write(st.session_state['results']['answer'])
         
         with st.form(key="sources"):    
             st.write("Sources:")
