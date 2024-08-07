@@ -138,7 +138,7 @@ def main():
                                            height=1400, 
                                            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                                            key='pdf'+str(idx),
-                                           rendering='legacy_iframe')
+                                           rendering='legacy_embed')
 
                     if results:
                         # write results to session state
