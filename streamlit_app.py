@@ -122,23 +122,43 @@ def main():
             if retrieve:
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
+
+                    st.write((st.session_state['results']['answer']))
+                    st.write("Sources:")
+
+                    source_selector = st.selectbox(
+                        "Select most relevant document fragments to view.",
+                        ("1", "2", "3", "4"),
+                        index=0,
+                        placeholder="Select a source...",
+                    )
+
+                    idx = int(source_selector) - 1
                     
                     @st.fragment
                     def render_results(run_every=5):
-                        st.write((st.session_state['results']['answer']))
-                        st.write("Sources:")
-                        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
-                        for idx, item in enumerate(st.session_state['results']['context']):
-                            with tabs_list[idx]:
-                                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
-                                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-                                st.write('Page number: %d' % page_num)
-                                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                                           width=900, 
-                                           height=1400, 
-                                           pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                                           key='pdf'+str(idx),
-                                           rendering='legacy_embed')
+                        st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+                        page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                        st.write('Page number: %d' % page_num)
+                        pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                                   width=900, 
+                                   height=1400, 
+                                   pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                                   key='pdf'+str(idx)
+                        )
+                                
+                        #tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
+                        #for idx, item in enumerate(st.session_state['results']['context']):
+                            #with tabs_list[idx]:
+                                # st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+                                # page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                                # st.write('Page number: %d' % page_num)
+                                # pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                                #            width=900, 
+                                #            height=1400, 
+                                #            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                                #            key='pdf'+str(idx)
+                                # )
 
                     if results:
                         # write results to session state
