@@ -71,9 +71,9 @@ def main():
     def form_upload_callback():
         with st.spinner('Processing...'):
             # clean up the state
-            # eg del the vector store and qachain if already existing from a prior run
-            del st.session_state['vectorstore']
-            del st.session_state['rag_chain']
+            # eg del the vector store and qachain if already intialized with prior doc set
+            for key in st.session_state.keys():
+                del st.session_state[key]
 
             if uploaded_docs is not None:
                 # save uploaded files to disk
