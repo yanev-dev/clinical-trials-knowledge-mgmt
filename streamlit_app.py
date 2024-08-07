@@ -123,7 +123,8 @@ def main():
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
                     
-                    @st.fragment 
+                    # refresh the fragment to ensure pdf rendering is updated
+                    @st.fragment(run_every=10)
                     def render_results():
                         st.write((st.session_state['results']['answer']))
                         st.write("Sources:")
@@ -138,15 +139,11 @@ def main():
                                            height=1400, 
                                            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                                            key='pdf'+str(idx))
-                        # refresh the fragment to ensure pdf rendering is updated
-                        st.rerun(scope='fragment')
-
                     if results:
                         # write results to session state
                         # call the fragment to render them
                         st.session_state['results'] = results
                         render_results()
-
             else:
                 st.write("No results found: try a different question or upload different documents!")
 
