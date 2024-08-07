@@ -139,7 +139,7 @@ def main():
                                            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                                            key='pdf'+str(idx))
                         # refresh the fragment to ensure pdf rendering is updated
-                        st.rerun()
+                        st.rerun(scope='fragment')
 
                     if results:
                         # write results to session state
