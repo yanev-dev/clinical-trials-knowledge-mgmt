@@ -109,7 +109,7 @@ def main():
                                  type=["pdf",],
                                  accept_multiple_files=True)
 
-        uploader_button = st.form_submit_button(label='Process Files', type="primary", on_click=form_upload_callback)
+        uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=form_upload_callback)
 
 
     # check if chain is ready before letting user ask questions    
