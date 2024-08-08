@@ -61,8 +61,24 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
+if 'pages' not in st.session_state:
+    st.session_state['pages'] = None
+
 if 'page_selection' not in st.session_state:
     st.session_state['page_selection'] = []
+
+
+with st.sidebar:
+    if not st.session_state['pages']:
+        st.session_state['page_selection'] = placeholder.multiselect(
+            "Select pages to display",
+            options=[],
+            default=[],
+            help="The page number considered is the PDF number and not the document page number.",
+            disabled=not st.session_state['pages'],
+            key='page_selector'
+        )
+
 
 def upload_callback():
     with st.spinner('Processing...'):
@@ -87,6 +103,18 @@ def upload_callback():
                     docs = loader.load()
                     # split the documents into chunks
                     splits.extend(text_splitter.split_documents(docs))
+                    #TODO will eventually need to support multidocs
+                    st.session_state['pages'] = len(docs) if not st.session_state['pages'] else st.session_state['pages']
+
+            if st.session_state['pages']:
+                st.session_state['page_selection'] = placeholder.multiselect(
+                    "Select pages to display",
+                    options=list(range(1, st.session_state['pages'])),
+                    default=[],
+                    help="The page number considered is the PDF number and not the document page number.",
+                    disabled=not st.session_state['pages'],
+                    key=2
+                )
 
             if splits:
                 # create the vectorestore to use as the index
@@ -104,6 +132,7 @@ def invoke_chain_callback():
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
 
+            
 with st.form(key='uploader'):
     uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
                              type=["pdf",],
@@ -131,21 +160,8 @@ if asked:
         st.write('Page number: %d' % page_num)
         pages.append(page_num)
 
-    with st.sidebar:
-        if not st.session_state['pages']:
-            st.session_state['page_selection'] = placeholder.multiselect(
-                "Select pages to display",
-                options=[],
-                default=[pages],
-                help="The page number considered is the PDF number and not the document page number.",
-                disabled=not st.session_state['pages'],
-                key='page_selector'
-            )
-            
     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                width=900, 
                height=1400, 
                pages_to_render=st.session_state['page_selection'],
                key='pdf_'+str(idx))
-# else:
-#     st.write("No results found: try a different question or upload different documents!")
