@@ -4,10 +4,12 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import os
 import base64
+import uuid
 
 import streamlit as st
 import pandas as pd
 
+from pdf2jpg import pdf2jpg
 from streamlit_pdf_viewer import pdf_viewer
 from tempfile import NamedTemporaryFile
 from langchain_community.document_loaders import PyPDFLoader
@@ -59,27 +61,37 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-def displayPDF_embed(file):
-    # Opening file from file path
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+def create_tmp_sub_folder():
+    """
+    Creates a temporary sub folder under tmp
 
-    # Embedding PDF in HTML
-    pdf_display =  f"""<embed
-    class="pdfobject"
-    type="application/pdf"
-    title="Embedded PDF"
-    src="data:application/pdf;base64,{base64_pdf}"
-    style="overflow: auto; width: 100%; height: 100%;">"""
+    :return:
+    """
+    if not os.path.exists("tmp"):
+        os.mkdir("tmp")
+    tmp_sub_folder_name = str(uuid.uuid4())[:8]
+    tmp_sub_folder_path = os.path.join("tmp", tmp_sub_folder_name)
+    os.mkdir(tmp_sub_folder_path)
+    return tmp_sub_folder_path
 
-    # Displaying File
-    st.markdown(pdf_display, unsafe_allow_html=True)
+def write_pdf(pdf_path, pages):
+    # Create temporary folder for generated image
+    tmp_sub_folder_path = create_tmp_sub_folder()
 
-def displayPDF_iframe(file):
-    with open(file, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    # Save images in that sub-folder
+    result = pdf2jpg.convert_pdf2jpg(pdf_path, tmp_sub_folder_path, pages=pages)
+    images = []
+    for image_path in result[0]["output_jpgfiles"]:
+        images.append(np.array(Image.open(image_path)))
+
+    # Create merged image from all images + remove irrelevant whitespace
+    merged_arr = np.concatenate(images)
+    merged_arr = crop_white_space(merged_arr)
+    merged_path = os.path.join(tmp_sub_folder_path, "merged.jpeg")
+    Image.fromarray(merged_arr).save(merged_path)
+
+    # Display the image
+    st.image(merged_path)
 
 
 def main():
@@ -155,7 +167,7 @@ def main():
                 #            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                 #            key='pdf'+str(idx)
                 # )
-                displayPDF_embed(st.session_state['results']['context'][idx].metadata['source'])
+                write_pdf(st.session_state['results']['context'][idx].metadata['source'], page_num)
 
             st.session_state['source_selector'] = st.selectbox(
                 "Select most relevant document fragments to view.",
