@@ -110,7 +110,8 @@ def main():
 
         uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=upload_callback)
 
-    # check if chain is ready before letting user ask questions    
+    # check if chain is ready before letting user ask questions 
+    asked = None   
     if 'rag_chain' in st.session_state:
         with st.form(key="questions"):
             question = st.write("Now ask a question about the documents!")
@@ -127,12 +128,12 @@ def main():
                 page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
                 st.write('Page number: %d' % page_num)
                 st.write(st.session_state['results']['context'][idx].page_content)
-                if st.button('Render PDF'):
+                if st.button('Render PDF', key='pdf_render_button_'+str(idx)):
                     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                                width=900, 
                                height=1400, 
                                pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                               key='pdf'+str(idx))
+                               key='pdf_'+str(idx))
     else:
         st.write("No results found: try a different question or upload different documents!")
 
