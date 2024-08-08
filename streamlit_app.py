@@ -59,7 +59,23 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-def displayPDF(file):
+def displayPDF_embed(file):
+    # Opening file from file path
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display =  f"""<embed
+    class="pdfobject"
+    type="application/pdf"
+    title="Embedded PDF"
+    src="data:application/pdf;base64,{base64_pdf}"
+    style="overflow: auto; width: 100%; height: 100%;">"""
+
+    # Displaying File
+    st.markdown(pdf_display, unsafe_allow_html=True)
+
+def displayPDF_iframe(file):
     with open(file, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode("utf-8")
     pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
@@ -133,12 +149,13 @@ def main():
                 st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
                 page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
                 st.write('Page number: %d' % page_num)
-                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                           width=900, 
-                           height=1400, 
-                           pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                           key='pdf'+str(idx)
-                )
+                # pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                #            width=900, 
+                #            height=1400, 
+                #            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                #            key='pdf'+str(idx)
+                # )
+                displayPDF_iframe(st.session_state['results']['context'][idx].metadata['source'])
 
             st.session_state['source_selector'] = st.selectbox(
                 "Select most relevant document fragments to view.",
