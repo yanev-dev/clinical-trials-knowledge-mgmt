@@ -98,21 +98,20 @@ def main():
 
         st.write('Finished uploading...')
 
-    def render_sources_callback():
+    def render_sources_callback(results):
         st.write("Sources:")
-        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
-        for idx, item in enumerate(st.session_state['results']['context']):
+        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
+        for idx, item in enumerate(results['context']):
             with tabs_list[idx]:
-                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
-                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                st.write('File name: ' + results['context'][idx].metadata['source'])
+                page_num = int(results['context'][idx].metadata['page']) + 1
                 st.write('Page number: %d' % page_num)
-                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                pdf_viewer(results['context'][idx].metadata['source'],
                            width=900, 
                            height=1400, 
-                           pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                           pages_to_render=[results['context'][idx].metadata['page']+1],
                            key='pdf'+str(idx))
 
-    
     with st.form(key='uploader'):
         uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
                                  type=["pdf",],
@@ -126,15 +125,15 @@ def main():
             question = st.write(
                 "Now ask a question about the documents!")
             question = st.text_input('Question:')
+            results = {}
             if question:
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
                     if results:
-                        st.session_state['results'] = results
-                        st.write((st.session_state['results']['answer']))
+                        st.write(results['answer'])
                     else:
                         st.write("No results found: try a different question or upload different documents!")
-            retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback)
+            retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback, args=(results))
 
 if __name__ == "__main__":
     main()
