@@ -129,7 +129,6 @@ def main():
                                            height=1400, 
                                            pages_to_render=[results['context'][idx].metadata['page']+1],
                                            key='pdf'+str(idx))
-                                st.rerun()
                     else:
                         st.write("No results found: try a different question or upload different documents!")
 
