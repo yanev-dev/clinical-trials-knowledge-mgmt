@@ -128,7 +128,7 @@ def main():
                 page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
                 st.write('Page number: %d' % page_num)
                 st.write(st.session_state['results']['context'][idx].page_content)
-                render_pdf = st.toggle("Render PDF")
+                render_pdf = st.toggle("Render PDF", key='toggle_'+str(idx))
                 if render_pdf:
                     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                                width=900, 
