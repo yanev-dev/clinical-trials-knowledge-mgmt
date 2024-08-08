@@ -132,16 +132,16 @@ if asked:
         pages.append(page_num)
 
     with st.sidebar:
-    if not st.session_state['pages']:
-        st.session_state['page_selection'] = placeholder.multiselect(
-            "Select pages to display",
-            options=[],
-            default=[pages],
-            help="The page number considered is the PDF number and not the document page number.",
-            disabled=not st.session_state['pages'],
-            key='page_selector'
-        )
-        
+        if not st.session_state['pages']:
+            st.session_state['page_selection'] = placeholder.multiselect(
+                "Select pages to display",
+                options=[],
+                default=[pages],
+                help="The page number considered is the PDF number and not the document page number.",
+                disabled=not st.session_state['pages'],
+                key='page_selector'
+            )
+            
     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                width=900, 
                height=1400, 
