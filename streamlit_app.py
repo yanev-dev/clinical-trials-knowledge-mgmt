@@ -124,11 +124,13 @@ def main():
                                 st.write('File name: ' + results['context'][idx].metadata['source'])
                                 page_num = int(results['context'][idx].metadata['page']) + 1
                                 st.write('Page number: %d' % page_num)
-                                pdf_viewer(results['context'][idx].metadata['source'],
-                                           width=900, 
-                                           height=1400, 
-                                           pages_to_render=[results['context'][idx].metadata['page']+1],
-                                           key='pdf'+str(idx))
+                                st.write(results['context'][idx].page_content)
+                                if st.button('Render PDF'):
+                                    pdf_viewer(results['context'][idx].metadata['source'],
+                                               width=900, 
+                                               height=1400, 
+                                               pages_to_render=[results['context'][idx].metadata['page']+1],
+                                               key='pdf'+str(idx))
                     else:
                         st.write("No results found: try a different question or upload different documents!")
 
