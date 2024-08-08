@@ -98,6 +98,11 @@ def main():
 
         st.write('Finished uploading...')
 
+    def invoke_chain_callback():
+        with st.spinner('Thinking...'):
+            st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
+            st.write('Chain returned an answer...')
+
     with st.form(key='uploader'):
         uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
                                  type=["pdf",],
@@ -108,31 +113,28 @@ def main():
     # check if chain is ready before letting user ask questions    
     if 'rag_chain' in st.session_state:
         with st.form(key="questions"):
-            question = st.write(
-                "Now ask a question about the documents!")
+            question = st.write("Now ask a question about the documents!")
             question = st.text_input('Question:')
-            retrieve = st.form_submit_button("Ask", type="primary",)
-            if retrieve:
-                with st.spinner('Thinking...'):
-                    results = st.session_state['rag_chain'].invoke({"input": question})
-                    if results:
-                        st.write(results['answer'])
-                        st.write("Sources:")
-                        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
-                        for idx, item in enumerate(results['context']):
-                            with tabs_list[idx]:
-                                st.write('File name: ' + results['context'][idx].metadata['source'])
-                                page_num = int(results['context'][idx].metadata['page']) + 1
-                                st.write('Page number: %d' % page_num)
-                                st.write(results['context'][idx].page_content)
-                                if st.button('Render PDF'):
-                                    pdf_viewer(results['context'][idx].metadata['source'],
-                                               width=900, 
-                                               height=1400, 
-                                               pages_to_render=[results['context'][idx].metadata['page']+1],
-                                               key='pdf'+str(idx))
-                    else:
-                        st.write("No results found: try a different question or upload different documents!")
+            asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)                
+                    
+    if asked:
+        st.write(st.session_state['results']['answer'])
+        st.write("Sources:")
+        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
+        for idx, item in enumerate(st.session_state['results']['context']):
+            with tabs_list[idx]:
+                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                st.write('Page number: %d' % page_num)
+                st.write(st.session_state['results']['context'][idx].page_content)
+                if st.button('Render PDF'):
+                    pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                               width=900, 
+                               height=1400, 
+                               pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                               key='pdf'+str(idx))
+    else:
+        st.write("No results found: try a different question or upload different documents!")
 
 if __name__ == "__main__":
     main()
