@@ -133,7 +133,7 @@ def main():
                         st.write(results['answer'])
                     else:
                         st.write("No results found: try a different question or upload different documents!")
-            retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback, args=(results))
+            retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback, args=(results,))
 
 if __name__ == "__main__":
     main()
