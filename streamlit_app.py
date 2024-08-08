@@ -132,9 +132,9 @@ def main():
                     if results:
                         st.session_state['results'] = results
                         st.write((st.session_state['results']['answer']))
-                        retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback)
                     else:
                         st.write("No results found: try a different question or upload different documents!")
+            retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback)
 
 if __name__ == "__main__":
     main()
