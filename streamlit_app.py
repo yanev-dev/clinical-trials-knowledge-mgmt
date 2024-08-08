@@ -155,7 +155,7 @@ def main():
                 #            pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                 #            key='pdf'+str(idx)
                 # )
-                displayPDF_iframe(st.session_state['results']['context'][idx].metadata['source'])
+                displayPDF_embed(st.session_state['results']['context'][idx].metadata['source'])
 
             st.session_state['source_selector'] = st.selectbox(
                 "Select most relevant document fragments to view.",
