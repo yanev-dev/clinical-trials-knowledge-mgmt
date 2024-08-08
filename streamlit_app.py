@@ -91,7 +91,7 @@ def write_pdf(pdf_path, pages):
     # Image.fromarray(merged_arr).save(merged_path)
 
     # Display the image
-    st.image(result[0]["output_jpgfiles"]) #(merged_path)
+    st.image(result[0]["output_jpgfiles"][0]) #(merged_path)
 
 
 def main():
