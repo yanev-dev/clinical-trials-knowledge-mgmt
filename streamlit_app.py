@@ -63,7 +63,7 @@ prompt = ChatPromptTemplate.from_messages(
 
 def main():
 
-    def form_upload_callback():
+    def upload_callback():
         with st.spinner('Processing...'):
             # clean up the state
             # eg del the vector store and qachain if already intialized with prior doc set
@@ -98,14 +98,27 @@ def main():
 
         st.write('Finished uploading...')
 
+    def render_sources_callback():
+        st.write("Sources:")
+        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
+        for idx, item in enumerate(st.session_state['results']['context']):
+            with tabs_list[idx]:
+                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                st.write('Page number: %d' % page_num)
+                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+                           key='pdf'+str(idx))
+
     
     with st.form(key='uploader'):
         uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
                                  type=["pdf",],
                                  accept_multiple_files=True)
 
-        uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=form_upload_callback)
-
+        uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=upload_callback)
 
     # check if chain is ready before letting user ask questions    
     if 'rag_chain' in st.session_state:
@@ -113,26 +126,15 @@ def main():
             question = st.write(
                 "Now ask a question about the documents!")
             question = st.text_input('Question:')
-            retrieve = st.form_submit_button("Ask", type="primary")
-            if retrieve:
+            if question:
                 with st.spinner('Thinking...'):
                     results = st.session_state['rag_chain'].invoke({"input": question})
                     if results:
-                        st.write((results['answer']))
-                        st.write("Sources:")
-                        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
-                        for idx, item in enumerate(results['context']):
-                            with tabs_list[idx]:
-                                st.write('File name: ' + results['context'][idx].metadata['source'])
-                                page_num = int(results['context'][idx].metadata['page']) + 1
-                                st.write('Page number: %d' % page_num)
-                                pdf_viewer(results['context'][idx].metadata['source'],
-                                           width=900, 
-                                           height=1400, 
-                                           pages_to_render=[results['context'][idx].metadata['page']+1],
-                                           key='pdf'+str(idx))
-            else:
-                st.write("No results found: try a different question or upload different documents!")
+                        st.session_state['results'] = results
+                        st.write((st.session_state['results']['answer']))
+                        retrieve = st.form_submit_button("Ask", type="primary", on_click=render_sources_callback)
+                    else:
+                        st.write("No results found: try a different question or upload different documents!")
 
 if __name__ == "__main__":
     main()
