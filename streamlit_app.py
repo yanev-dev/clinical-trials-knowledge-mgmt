@@ -81,17 +81,17 @@ def write_pdf(pdf_path, pages):
     # Save images in that sub-folder
     result = pdf2jpg.convert_pdf2jpg(pdf_path, tmp_sub_folder_path, pages=pages)
     images = []
-    for image_path in result[0]["output_jpgfiles"]:
-        images.append(np.array(Image.open(image_path)))
+    # for image_path in result[0]["output_jpgfiles"]:
+    #     images.append(np.array(Image.open(image_path)))
 
-    # Create merged image from all images + remove irrelevant whitespace
-    merged_arr = np.concatenate(images)
-    merged_arr = crop_white_space(merged_arr)
-    merged_path = os.path.join(tmp_sub_folder_path, "merged.jpeg")
-    Image.fromarray(merged_arr).save(merged_path)
+    # # Create merged image from all images + remove irrelevant whitespace
+    # merged_arr = np.concatenate(images)
+    # merged_arr = crop_white_space(merged_arr)
+    # merged_path = os.path.join(tmp_sub_folder_path, "merged.jpeg")
+    # Image.fromarray(merged_arr).save(merged_path)
 
     # Display the image
-    st.image(merged_path)
+    st.image(result[0]["output_jpgfiles"]) #(merged_path)
 
 
 def main():
