@@ -103,12 +103,6 @@ def main():
             st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
             st.write('Chain returned an answer...')
 
-    if 'clicked' not in st.session_state:
-        st.session_state.clicked = False
-
-    def click_to_render():
-        st.session_state.clicked = True
-
     with st.form(key='uploader'):
         uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
                                  type=["pdf",],
@@ -134,15 +128,14 @@ def main():
                 page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
                 st.write('Page number: %d' % page_num)
                 st.write(st.session_state['results']['context'][idx].page_content)
-                st.button('Render PDF', key='pdf_render_button_'+str(idx), on_click=click_to_render)
-                if st.session_state.clicked:
+                if st.toggle("Render PDF)":
                     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                                width=900, 
                                height=1400, 
                                pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
                                key='pdf_'+str(idx))
-    else:
-        st.write("No results found: try a different question or upload different documents!")
+    # else:
+    #     st.write("No results found: try a different question or upload different documents!")
 
 if __name__ == "__main__":
     main()
