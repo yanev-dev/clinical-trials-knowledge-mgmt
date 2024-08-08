@@ -100,17 +100,18 @@ def main():
 
     def render_sources_callback(results):
         st.write("Sources:")
-        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
-        for idx, item in enumerate(results['context']):
-            with tabs_list[idx]:
-                st.write('File name: ' + results['context'][idx].metadata['source'])
-                page_num = int(results['context'][idx].metadata['page']) + 1
-                st.write('Page number: %d' % page_num)
-                pdf_viewer(results['context'][idx].metadata['source'],
-                           width=900, 
-                           height=1400, 
-                           pages_to_render=[results['context'][idx].metadata['page']+1],
-                           key='pdf'+str(idx))
+        if results:
+            tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(results['context'])])                            
+            for idx, item in enumerate(results['context']):
+                with tabs_list[idx]:
+                    st.write('File name: ' + results['context'][idx].metadata['source'])
+                    page_num = int(results['context'][idx].metadata['page']) + 1
+                    st.write('Page number: %d' % page_num)
+                    pdf_viewer(results['context'][idx].metadata['source'],
+                               width=900, 
+                               height=1400, 
+                               pages_to_render=[results['context'][idx].metadata['page']+1],
+                               key='pdf'+str(idx))
 
     with st.form(key='uploader'):
         uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
