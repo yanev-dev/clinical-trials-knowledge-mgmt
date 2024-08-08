@@ -121,20 +121,22 @@ def main():
     if asked:
         st.write(st.session_state['results']['answer'])
         st.write("Sources:")
-        tabs_list = st.tabs(['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])])                            
+        source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
         for idx, item in enumerate(st.session_state['results']['context']):
-            with tabs_list[idx]:
-                st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
-                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-                st.write('Page number: %d' % page_num)
-                st.write(st.session_state['results']['context'][idx].page_content)
-                render_pdf = st.toggle("Render PDF", key='toggle_'+str(idx))
-                if render_pdf:
-                    pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                               width=900, 
-                               height=1400, 
-                               pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
-                               key='pdf_'+str(idx))
+            st.write(source_list[idx])
+            st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+            page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+            st.write('Page number: %d' % page_num)
+            st.write('Preview:')
+            st.write(st.session_state['results']['context'][idx].page_content[:100])
+            
+            # render_pdf = st.toggle("Render PDF", key='toggle_'+str(idx))
+            # if render_pdf:
+            #     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+            #                width=900, 
+            #                height=1400, 
+            #                pages_to_render=[st.session_state['results']['context'][idx].metadata['page']+1],
+            #                key='pdf_'+str(idx))
     # else:
     #     st.write("No results found: try a different question or upload different documents!")
 
