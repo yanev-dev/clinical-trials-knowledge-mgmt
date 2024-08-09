@@ -79,7 +79,7 @@ with st.sidebar:
             default=[],
             help="The page number considered is the PDF number and not the document page number.",
             disabled=not st.session_state['pages'],
-            key='page_selector'
+            key=1
         )
 
 
@@ -109,16 +109,6 @@ def upload_callback():
                     #TODO will eventually need to support multidocs
                     st.session_state['pages'] = len(docs) #if not st.session_state['pages'] else st.session_state['pages']
 
-            if st.session_state['pages']:
-                st.session_state['page_selection'] = placeholder.multiselect(
-                    "Select pages to display",
-                    options=list(range(1, st.session_state['pages'])),
-                    default=[],
-                    help="The page number considered is the PDF number and not the document page number.",
-                    disabled=not st.session_state['pages'],
-                    key=2
-                )
-
             if splits:
                 # create the vectorestore to use as the index
                 st.session_state['vectorstore'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
@@ -142,6 +132,16 @@ with st.form(key='uploader'):
                              accept_multiple_files=True)
 
     uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=upload_callback)
+
+if st.session_state['pages']:
+    st.session_state['page_selection'] = placeholder.multiselect(
+        "Select pages to display",
+        options=list(range(1, st.session_state['pages'])),
+        default=[],
+        help="The page number considered is the PDF number and not the document page number.",
+        disabled=not st.session_state['pages'],
+        key=2
+    )
 
 # check if chain is ready before letting user ask questions 
 asked = None   
