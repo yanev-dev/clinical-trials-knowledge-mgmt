@@ -68,10 +68,10 @@ if 'page_selection' not in st.session_state:
     st.session_state['page_selection'] = []
 
 if 'vector_store' not in st.session_state:
-    st.session_state['vector_store'] = None
+    st.session_state['vector_store'] = []
 
 if 'rag_chain' not in st.session_state:
-    st.session_state['rag_chain'] = None  
+    st.session_state['rag_chain'] = []
 
 
 with st.sidebar:
