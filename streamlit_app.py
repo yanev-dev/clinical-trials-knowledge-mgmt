@@ -156,7 +156,7 @@ if asked:
     if st.session_state['pages']:
         st.session_state['page_selection'] = placeholder.multiselect(
             "Select pages to display",
-            options=list(range(1, st.session_state['pages'])),
+            options=list(range(1, st.session_state['pages'] + 1)),
             default=source_pages,
             help="The page number considered is the PDF number and not the document page number.",
             disabled=not st.session_state['pages'],
