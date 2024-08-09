@@ -69,6 +69,9 @@ if 'page_selection' not in st.session_state:
 
 
 with st.sidebar:
+    st.header("Page Selection")
+    placeholder = st.empty()
+    
     if not st.session_state['pages']:
         st.session_state['page_selection'] = placeholder.multiselect(
             "Select pages to display",
