@@ -107,7 +107,7 @@ def upload_callback():
                     # split the documents into chunks
                     splits.extend(text_splitter.split_documents(docs))
                     #TODO will eventually need to support multidocs
-                    st.session_state['pages'] = len(docs) if not st.session_state['pages'] else st.session_state['pages']
+                    st.session_state['pages'] = len(docs) #if not st.session_state['pages'] else st.session_state['pages']
 
             if st.session_state['pages']:
                 st.session_state['page_selection'] = placeholder.multiselect(
