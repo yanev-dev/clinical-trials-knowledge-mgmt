@@ -133,16 +133,6 @@ with st.form(key='uploader'):
 
     uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=upload_callback)
 
-if st.session_state['pages']:
-    st.session_state['page_selection'] = placeholder.multiselect(
-        "Select pages to display",
-        options=list(range(1, st.session_state['pages'])),
-        default=[],
-        help="The page number considered is the PDF number and not the document page number.",
-        disabled=not st.session_state['pages'],
-        key=2
-    )
-
 # check if chain is ready before letting user ask questions 
 asked = None   
 if 'rag_chain' in st.session_state:
@@ -154,14 +144,24 @@ if 'rag_chain' in st.session_state:
 if asked:
     st.write(st.session_state['results']['answer'])
     st.write("Sources:")
-    pages = []
+    source_pages = []
     source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
     for idx, item in enumerate(st.session_state['results']['context']):
         st.write(source_list[idx])
         st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
         page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
         st.write('Page number: %d' % page_num)
-        pages.append(page_num)
+        source_pages.append(page_num)
+
+    if st.session_state['pages']:
+        st.session_state['page_selection'] = placeholder.multiselect(
+            "Select pages to display",
+            options=list(range(1, st.session_state['pages'])),
+            default=source_pages,
+            help="The page number considered is the PDF number and not the document page number.",
+            disabled=not st.session_state['pages'],
+            key=2
+        )
 
     pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                width=900, 
