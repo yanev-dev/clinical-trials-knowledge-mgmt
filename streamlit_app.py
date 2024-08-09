@@ -67,6 +67,12 @@ if 'pages' not in st.session_state:
 if 'page_selection' not in st.session_state:
     st.session_state['page_selection'] = []
 
+if 'vectorstore' not in st.session_state:
+    st.session_state['vectorstore'] = None
+
+if 'rag_chain' not in st.session_state:
+    st.session_state['rag_chain'] = None  
+
 
 with st.sidebar:
     st.header("Page Selection")
@@ -111,12 +117,14 @@ def upload_callback():
 
             if splits:
                 # create the vectorestore to use as the index
-                st.session_state['vectorstore'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-                # expose this index in a retriever interface
-                retriever = st.session_state['vectorstore'].as_retriever()
-                # create a chain to answer questions 
-                question_answer_chain = create_stuff_documents_chain(llm, prompt)
-                st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
+                if st.session_state['vectorstore'] is None:
+                    st.session_state['vectorstore'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+                    # expose this index in a retriever interface
+                    retriever = st.session_state['vectorstore'].as_retriever()
+                    # create a chain to answer questions 
+                    question_answer_chain = create_stuff_documents_chain(llm, prompt)
+                if st.session_state['rag_chain'] is None:
+                    st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
 
     st.write('Finished uploading...')
 
