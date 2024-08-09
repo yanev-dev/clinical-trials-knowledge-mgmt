@@ -117,13 +117,13 @@ def upload_callback():
 
             if splits:
                 # create the vectorestore to use as the index
-                if not st.session_state['vector_store']:
+                if 'vector_store' not in st.session_state:
                     st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
                     # expose this index in a retriever interface
                     retriever = st.session_state['vector_store'].as_retriever()
                     # create a chain to answer questions 
                     question_answer_chain = create_stuff_documents_chain(llm, prompt)
-                if not st.session_state['rag_chain']:
+                if 'rag_chain' not in st.session_state:
                     st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
 
     st.write('Finished uploading...')
