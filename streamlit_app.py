@@ -44,8 +44,8 @@ text_splitter = SemanticChunker(
 system_prompt = (
         """
         You are assisting a clinical research coordinator engaged in a clinical trial for a new drug.
-        Use the following pieces of retrieved context from the trial research protocol to answer the question.
-        Cite details from the context pertaining to an answer and be very thorough.
+        Use the following pieces of retrieved context from the trial documents to answer the question.
+        Cite details from the context pertaining to an answer and be very thorough, including the source document and page numbers where available.
         If you don't know the answer, say that you don't know.
         
         "\n\n"
