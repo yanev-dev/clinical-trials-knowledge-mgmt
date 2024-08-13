@@ -12,5 +12,4 @@ langchain-groq
 langchain_chroma
 langchain_experimental
 streamlit-pdf-viewer==0.0.16
-cryptography>=3.1
 protobuf==3.20.0
