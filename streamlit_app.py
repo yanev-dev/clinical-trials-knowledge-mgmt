@@ -174,7 +174,7 @@ if asked:
     for idx, tab in enumerate(tabs_list):
         with tab:
             print("File name: " + files_list[idx])
-            with st.expander("See source document", key='exp_'+files_list[idx]):
+            with st.expander("See source document"):
                 if st.session_state['pages']:
                     st.session_state['page_selection'] = placeholder.multiselect(
                         "Select pages to display",
