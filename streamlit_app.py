@@ -174,14 +174,14 @@ if asked:
             st.session_state['page_selection'] = placeholder.multiselect(
                 "Select pages to display",
                 options=list(range(1, st.session_state['pages'] + 1)),
-                default=file_to_pages[fname],
+                default=file_to_pages[tab],
                 help="The page number considered is the PDF number and not the document page number.",
                 disabled=not st.session_state['pages'],
-                key=2
+                key='page_selector_'+tab
             )
 
             pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
                        width=900, 
                        height=1400, 
                        pages_to_render=st.session_state['page_selection'],
-                       key='pdf_'+str(idx))
+                       key='pdf_'+tab)
