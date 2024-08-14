@@ -168,20 +168,24 @@ if asked:
         else:
             file_to_pages[fname].append(page_num)
 
-    tabs_list = st.tabs(file_to_pages.keys())
-    for tab in tabs_list:
-        if st.session_state['pages']:
-            st.session_state['page_selection'] = placeholder.multiselect(
-                "Select pages to display",
-                options=list(range(1, st.session_state['pages'] + 1)),
-                default=file_to_pages[tab],
-                help="The page number considered is the PDF number and not the document page number.",
-                disabled=not st.session_state['pages'],
-                key='page_selector_'+tab
-            )
+    files_list = [k for k,v in file_to_pages.items()]
+    pages_ranges_list = [v for k,v in file_to_pages.items()]
+    tabs_list = st.tabs(files_list)
+    for idx, tab in enumerate(tabs_list):
+        with tab:
+            print("File name: " + files_list[idx])
+            if st.session_state['pages']:
+                st.session_state['page_selection'] = placeholder.multiselect(
+                    "Select pages to display",
+                    options=list(range(1, st.session_state['pages'] + 1)),
+                    default=pages_ranges_list[idx],
+                    help="The page number considered is the PDF number and not the document page number.",
+                    disabled=not st.session_state['pages'],
+                    key='page_selector_'+files_list[idx]
+                )
 
-            pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                       width=900, 
-                       height=1400, 
-                       pages_to_render=st.session_state['page_selection'],
-                       key='pdf_'+tab)
+                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=st.session_state['page_selection'],
+                           key='pdf_'+files_list[idx])
