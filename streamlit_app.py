@@ -113,9 +113,9 @@ def upload_callback():
                     # split the documents into chunks
                     splits.extend(text_splitter.split_documents(docs))
                     #TODO will eventually need to support multidocs
-                    st.session_state['pages'] = len(docs) #if not st.session_state['pages'] else st.session_state['pages']
-
+                    
             if splits:
+                st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
                 # create the vectorestore to use as the index
                 if 'vector_store' not in st.session_state:
                     st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
@@ -152,27 +152,36 @@ if 'rag_chain' in st.session_state:
 if asked:
     st.write(st.session_state['results']['answer'])
     st.write("Sources:")
-    source_pages = []
+    # source_pages = []
+    # files_names = []
+    file_to_pages = {}
     source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
     for idx, item in enumerate(st.session_state['results']['context']):
         st.write(source_list[idx])
-        st.write('File name: ' + st.session_state['results']['context'][idx].metadata['source'])
+        fname = st.session_state['results']['context'][idx].metadata['source']
+        st.write('File name: ' + fname)
         page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
         st.write('Page number: %d' % page_num)
-        source_pages.append(page_num)
+        #source_pages.append(page_num)
+        if fname not in file_to_pages:
+            file_to_pages[fname] = [page_num]
+        else:
+            file_to_pages[fname].append(page_num)
 
-    if st.session_state['pages']:
-        st.session_state['page_selection'] = placeholder.multiselect(
-            "Select pages to display",
-            options=list(range(1, st.session_state['pages'] + 1)),
-            default=source_pages,
-            help="The page number considered is the PDF number and not the document page number.",
-            disabled=not st.session_state['pages'],
-            key=2
-        )
+    tabs_list = st.tabs(file_to_pages.keys())
+    for tab in tabs_list:
+        if st.session_state['pages']:
+            st.session_state['page_selection'] = placeholder.multiselect(
+                "Select pages to display",
+                options=list(range(1, st.session_state['pages'] + 1)),
+                default=file_to_pages[fname],
+                help="The page number considered is the PDF number and not the document page number.",
+                disabled=not st.session_state['pages'],
+                key=2
+            )
 
-    pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-               width=900, 
-               height=1400, 
-               pages_to_render=st.session_state['page_selection'],
-               key='pdf_'+str(idx))
+            pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                       width=900, 
+                       height=1400, 
+                       pages_to_render=st.session_state['page_selection'],
+                       key='pdf_'+str(idx))
