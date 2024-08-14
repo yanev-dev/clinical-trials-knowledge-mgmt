@@ -174,18 +174,19 @@ if asked:
     for idx, tab in enumerate(tabs_list):
         with tab:
             print("File name: " + files_list[idx])
-            if st.session_state['pages']:
-                st.session_state['page_selection'] = placeholder.multiselect(
-                    "Select pages to display",
-                    options=list(range(1, st.session_state['pages'] + 1)),
-                    default=pages_ranges_list[idx],
-                    help="The page number considered is the PDF number and not the document page number.",
-                    disabled=not st.session_state['pages'],
-                    key='page_selector_'+files_list[idx]
-                )
+            with st.expander("See source document"):
+                if st.session_state['pages']:
+                    st.session_state['page_selection'] = placeholder.multiselect(
+                        "Select pages to display",
+                        options=list(range(1, st.session_state['pages'] + 1)),
+                        default=pages_ranges_list[idx],
+                        help="The page number considered is the PDF number and not the document page number.",
+                        disabled=not st.session_state['pages'],
+                        key='page_selector_'+files_list[idx]
+                    )
 
-                pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
-                           width=900, 
-                           height=1400, 
-                           pages_to_render=st.session_state['page_selection'],
-                           key='pdf_'+files_list[idx])
+                    pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                               width=900, 
+                               height=1400, 
+                               pages_to_render=st.session_state['page_selection'],
+                               key='pdf_'+files_list[idx])
