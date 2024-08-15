@@ -188,10 +188,10 @@ if asked:
                             key='page_selector_'+k
                         )
 
-                        pdf_viewer(k,
-                                   width=900, 
-                                   height=1400, 
-                                   pages_to_render=page_selector,
-                                   key='pdf_'+k)
-
                 render_pdf_pages()
+                pdf_viewer(k,
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=page_selector,
+                           key='pdf_'+k)
+
