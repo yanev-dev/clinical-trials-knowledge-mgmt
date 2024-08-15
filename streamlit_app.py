@@ -175,7 +175,7 @@ if asked:
             with st.expander("See document source"):
                 st.subheader("Relevant pages")
 
-                with st.form('pdf_render', key='pdf_form_'+k):
+                with st.form(key='pdf_form_'+k):
 
                     def render_pdf_pages():
                         pdf_viewer(k,
