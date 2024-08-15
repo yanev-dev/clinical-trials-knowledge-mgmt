@@ -158,11 +158,11 @@ if asked:
     file_to_pages = {}
     source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
     for idx, item in enumerate(st.session_state['results']['context']):
-        st.subheader(source_list[idx])
+        #st.subheader(source_list[idx])
         fname = st.session_state['results']['context'][idx].metadata['source']
-        st.write('File name: ' + fname)
+        #st.write('File name: ' + fname)
         page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-        st.write('Page number: %d' % page_num)
+        #st.write('Page number: %d' % page_num)
         #source_pages.append(page_num)
         if fname not in file_to_pages:
             file_to_pages[fname] = [page_num]
@@ -174,24 +174,23 @@ if asked:
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages")
-
-                with st.form(key='pdf_form_'+k):
-
-                    def render_pdf_pages():
-                        pdf_viewer(k,
-                                   width=900, 
-                                   height=1400, 
-                                   pages_to_render=st.session_state['page_selection'],
-                                   key='pdf_'+k)
-
+                    
+                @st.fragment
+                def render_pdf_pages():
                     placeholder = st.empty()
                     if st.session_state['pages']:
                         st.session_state['page_selection'] = placeholder.multiselect(
-                            "",
+                            "Select pages to display",
                             options=list(range(1, st.session_state['pages'] + 1)),
                             default=v,
                             help="The page number considered is the PDF number and not the document page number.",
                             disabled=not st.session_state['pages'],
                             key='page_selector_'+k
                         )
-                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages)
+
+                render_pdf_pages()
+                pdf_viewer(k,
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=st.session_state['page_selection'],
+                           key='pdf_'+k)
