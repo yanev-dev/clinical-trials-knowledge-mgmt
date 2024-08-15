@@ -168,12 +168,12 @@ if asked:
         else:
             file_to_pages[fname].append(page_num)
 
-    files_list = [k for k,v in file_to_pages.items()]
-    pages_ranges_list = [v for k,v in file_to_pages.items()]
-    tabs_list = st.tabs(files_list)
-    for idx, tab in enumerate(tabs_list):
-        with tab:
-            print("File name: " + files_list[idx])
+    # files_list = [k for k,v in file_to_pages.items()]
+    # pages_ranges_list = [v for k,v in file_to_pages.items()]
+    # tabs_list = st.tabs(files_list)
+    for k,v in file_to_pages.items():
+        with st.container():
+            print("File name: " + k)
             with st.expander("See source document"):
                 st.header("Page Selection")
                 placeholder = st.empty()
@@ -181,14 +181,14 @@ if asked:
                     st.session_state['page_selection'] = placeholder.multiselect(
                         "Select pages to display",
                         options=list(range(1, st.session_state['pages'] + 1)),
-                        default=pages_ranges_list[idx],
+                        default=v,
                         help="The page number considered is the PDF number and not the document page number.",
                         disabled=not st.session_state['pages'],
-                        key='page_selector_'+files_list[idx]
+                        key='page_selector_'+k
                     )
 
-                    pdf_viewer(st.session_state['results']['context'][idx].metadata['source'],
+                    pdf_viewer(k,
                                width=900, 
                                height=1400, 
                                pages_to_render=st.session_state['page_selection'],
-                               key='pdf_'+files_list[idx])
+                               key='pdf_'+k)
