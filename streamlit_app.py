@@ -173,24 +173,25 @@ if asked:
         with st.container():
             st.header("File name: " + k)
             with st.expander("See document source"):
-                st.subheader("Page Selection")
-                
-                @st.fragment
-                def render_pdf_pages():
+                st.subheader("Relevant pages")
+
+                with st.form('pdf_render', key='pdf_form_'+k):
+
+                    def render_pdf_pages():
+                        pdf_viewer(k,
+                                   width=900, 
+                                   height=1400, 
+                                   pages_to_render=st.session_state['page_selection'],
+                                   key='pdf_'+k)
+                        
                     placeholder = st.empty()
                     if st.session_state['pages']:
                         st.session_state['page_selection'] = placeholder.multiselect(
-                            "Select pages to display",
+                            "",
                             options=list(range(1, st.session_state['pages'] + 1)),
                             default=v,
                             help="The page number considered is the PDF number and not the document page number.",
                             disabled=not st.session_state['pages'],
                             key='page_selector_'+k
                         )
-
-                render_pdf_pages()
-                pdf_viewer(k,
-                           width=900, 
-                           height=1400, 
-                           pages_to_render=st.session_state['page_selection'],
-                           key='pdf_'+k)
+                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages)
