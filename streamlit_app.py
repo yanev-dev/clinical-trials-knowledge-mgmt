@@ -194,4 +194,4 @@ if asked:
                             disabled=not st.session_state['pages'],
                             key='page_selector_'+k
                         )
-                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages, key='pdf_form_submit'+k)
+                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages)
