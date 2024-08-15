@@ -183,7 +183,7 @@ if asked:
                                    height=1400, 
                                    pages_to_render=st.session_state['page_selection'],
                                    key='pdf_'+k)
-                        
+
                     placeholder = st.empty()
                     if st.session_state['pages']:
                         st.session_state['page_selection'] = placeholder.multiselect(
@@ -194,4 +194,4 @@ if asked:
                             disabled=not st.session_state['pages'],
                             key='page_selector_'+k
                         )
-                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages)
+                    submitted = st.form_submit_button("Submit", on_click=render_pdf_pages, key='pdf_form_submit'+k)
