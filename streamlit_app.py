@@ -74,19 +74,19 @@ if 'rag_chain' not in st.session_state:
     st.session_state['rag_chain'] = None
 
 
-with st.sidebar:
-    st.header("Page Selection")
-    placeholder = st.empty()
+# with st.sidebar:
+#     st.header("Page Selection")
+#     placeholder = st.empty()
     
-    if not st.session_state['pages']:
-        st.session_state['page_selection'] = placeholder.multiselect(
-            "Select pages to display",
-            options=[],
-            default=[],
-            help="The page number considered is the PDF number and not the document page number.",
-            disabled=not st.session_state['pages'],
-            key=1
-        )
+#     if not st.session_state['pages']:
+#         st.session_state['page_selection'] = placeholder.multiselect(
+#             "Select pages to display",
+#             options=[],
+#             default=[],
+#             help="The page number considered is the PDF number and not the document page number.",
+#             disabled=not st.session_state['pages'],
+#             key=1
+#         )
 
 
 def upload_callback():
@@ -175,6 +175,8 @@ if asked:
         with tab:
             print("File name: " + files_list[idx])
             with st.expander("See source document"):
+                st.header("Page Selection")
+                placeholder = st.empty()
                 if st.session_state['pages']:
                     st.session_state['page_selection'] = placeholder.multiselect(
                         "Select pages to display",
