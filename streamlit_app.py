@@ -179,7 +179,7 @@ if asked:
                 def render_pdf_pages():
                     placeholder = st.empty()
                     if st.session_state['pages']:
-                        page_selector = placeholder.multiselect(
+                        st.session_state['page_selection'] = placeholder.multiselect(
                             "Select pages to display",
                             options=list(range(1, st.session_state['pages'] + 1)),
                             default=v,
@@ -192,6 +192,5 @@ if asked:
                 pdf_viewer(k,
                            width=900, 
                            height=1400, 
-                           pages_to_render=page_selector,
+                           pages_to_render=st.session_state['page_selection'],
                            key='pdf_'+k)
-
