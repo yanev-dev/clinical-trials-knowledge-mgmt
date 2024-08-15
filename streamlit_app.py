@@ -150,14 +150,15 @@ if 'rag_chain' in st.session_state:
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)                
                 
 if asked:
+    st.header('Answer:')
     st.write(st.session_state['results']['answer'])
-    st.write("Sources:")
+    st.header("Sources:")
     # source_pages = []
     # files_names = []
     file_to_pages = {}
     source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
     for idx, item in enumerate(st.session_state['results']['context']):
-        st.write(source_list[idx])
+        st.subheader(source_list[idx])
         fname = st.session_state['results']['context'][idx].metadata['source']
         st.write('File name: ' + fname)
         page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
@@ -168,17 +169,14 @@ if asked:
         else:
             file_to_pages[fname].append(page_num)
 
-    # files_list = [k for k,v in file_to_pages.items()]
-    # pages_ranges_list = [v for k,v in file_to_pages.items()]
-    # tabs_list = st.tabs(files_list)
     for k,v in file_to_pages.items():
         with st.container():
-            print("File name: " + k)
-            with st.expander("See source document"):
-                st.header("Page Selection")
+            st.header("File name: " + k)
+            with st.expander("See document source"):
+                st.subheader("Page Selection")
                 placeholder = st.empty()
                 if st.session_state['pages']:
-                    st.session_state['page_selection'] = placeholder.multiselect(
+                    page_selector = placeholder.multiselect(
                         "Select pages to display",
                         options=list(range(1, st.session_state['pages'] + 1)),
                         default=v,
@@ -190,5 +188,5 @@ if asked:
                     pdf_viewer(k,
                                width=900, 
                                height=1400, 
-                               pages_to_render=st.session_state['page_selection'],
+                               pages_to_render=page_selector,
                                key='pdf_'+k)
