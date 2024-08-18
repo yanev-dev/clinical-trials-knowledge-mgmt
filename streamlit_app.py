@@ -159,7 +159,21 @@ if asked:
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages:")
-                st.markdown(':green[' + ', '.join(str(x) for x in sorted(v)) + ']')
+                page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
+
+                @st.fragment()
+                def render_pdf_pages(run_every="10s"):
+                    cols = st.columns(2)
+                    cols[0].markdown(page_str)
+                    cols[1].toggle("Refresh")
+                    pdf_viewer(k,
+                               width=900, 
+                               height=1400, 
+                               pages_to_render=v, #st.session_state['page_selection'],
+                               key='pdf_'+k)
+
+                render_pdf_pages()
+                    
                     
                 # @st.fragment
                 # def render_pdf_pages():
@@ -175,9 +189,3 @@ if asked:
                 #         )
 
                 #render_pdf_pages()
-
-                pdf_viewer(k,
-                           width=900, 
-                           height=1400, 
-                           pages_to_render=v, #st.session_state['page_selection'],
-                           key='pdf_'+k)
