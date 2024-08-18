@@ -159,8 +159,8 @@ if asked:
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages")
-                cols_list = st.columns(len(v))
-                for col, page in zip(cols_list, v):
+                col, _, _ = st.columns(3)
+                for page in v:
                     col.metric(label="", value=page)
                     
                 # @st.fragment
