@@ -159,9 +159,7 @@ if asked:
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages")
-                col, _, _ = st.columns(3)
-                for page in v:
-                    col.metric(label="", value=page)
+                st.markdown(':green[' + ', '.join(str(x) for x in v) + ']')
                     
                 # @st.fragment
                 # def render_pdf_pages():
