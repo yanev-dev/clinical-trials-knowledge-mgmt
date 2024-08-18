@@ -158,8 +158,8 @@ if asked:
         with st.container():
             st.header("File name: " + k)
             with st.expander("See document source"):
-                st.subheader("Relevant pages")
-                st.markdown(':green[' + ', '.join(str(x) for x in v) + ']')
+                st.subheader("Relevant pages:")
+                st.markdown(':green[' + ', '.join(str(x) for x in sorted(v)) + ']')
                     
                 # @st.fragment
                 # def render_pdf_pages():
