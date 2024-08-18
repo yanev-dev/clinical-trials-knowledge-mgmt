@@ -61,32 +61,17 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
-if 'pages' not in st.session_state:
-    st.session_state['pages'] = None
+# if 'pages' not in st.session_state:
+#     st.session_state['pages'] = None
 
-if 'page_selection' not in st.session_state:
-    st.session_state['page_selection'] = []
+# if 'page_selection' not in st.session_state:
+#     st.session_state['page_selection'] = []
 
 if 'vector_store' not in st.session_state:
     st.session_state['vector_store'] = None
 
 if 'rag_chain' not in st.session_state:
     st.session_state['rag_chain'] = None
-
-
-# with st.sidebar:
-#     st.header("Page Selection")
-#     placeholder = st.empty()
-    
-#     if not st.session_state['pages']:
-#         st.session_state['page_selection'] = placeholder.multiselect(
-#             "Select pages to display",
-#             options=[],
-#             default=[],
-#             help="The page number considered is the PDF number and not the document page number.",
-#             disabled=not st.session_state['pages'],
-#             key=1
-#         )
 
 
 def upload_callback():
@@ -115,7 +100,7 @@ def upload_callback():
                     #TODO will eventually need to support multidocs
                     
             if splits:
-                st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
+                # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
                 # create the vectorestore to use as the index
                 if 'vector_store' not in st.session_state:
                     st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
@@ -174,23 +159,27 @@ if asked:
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages")
+                cols_list = st.columns(len(v))
+                for col, page in zip(cols_list, v):
+                    col.metric(label="", value=v)
                     
-                @st.fragment
-                def render_pdf_pages():
-                    placeholder = st.empty()
-                    if st.session_state['pages']:
-                        st.session_state['page_selection'] = placeholder.multiselect(
-                            "Select pages to display",
-                            options=list(range(1, st.session_state['pages'] + 1)),
-                            default=v,
-                            help="The page number considered is the PDF number and not the document page number.",
-                            disabled=not st.session_state['pages'],
-                            key='page_selector_'+k
-                        )
+                # @st.fragment
+                # def render_pdf_pages():
+                #     placeholder = st.empty()
+                #     if st.session_state['pages']:
+                #         st.session_state['page_selection'] = placeholder.multiselect(
+                #             "Select pages to display",
+                #             options=list(range(1, st.session_state['pages'] + 1)),
+                #             default=v,
+                #             help="The page number considered is the PDF number and not the document page number.",
+                #             disabled=not st.session_state['pages'],
+                #             key='page_selector_'+k
+                #         )
 
-                render_pdf_pages()
+                #render_pdf_pages()
+
                 pdf_viewer(k,
                            width=900, 
                            height=1400, 
-                           pages_to_render=st.session_state['page_selection'],
+                           pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
