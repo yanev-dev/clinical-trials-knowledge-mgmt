@@ -161,7 +161,7 @@ if asked:
                 st.subheader("Relevant pages")
                 cols_list = st.columns(len(v))
                 for col, page in zip(cols_list, v):
-                    col.metric(label="", value=v)
+                    col.metric(label="", value=page)
                     
                 # @st.fragment
                 # def render_pdf_pages():
