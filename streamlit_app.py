@@ -130,6 +130,7 @@ def render_pdf_pages():
                                height=1400, 
                                pages_to_render=v, #st.session_state['page_selection'],
                                key='pdf_'+k)
+        st.rerun()
 
 #### App code ####
 
