@@ -93,7 +93,6 @@ def invoke_chain_callback():
     with st.spinner('Thinking...'):
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
-        st.write(st.session_state['results']['answer'])
             
 with st.form(key='uploader'):
     uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
