@@ -61,9 +61,6 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
-# if 'pages' not in st.session_state:
-#     st.session_state['pages'] = None
-
 if 'results' not in st.session_state:
     st.session_state['results'] = None
 
@@ -89,28 +86,6 @@ def upload_callback():
                 with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
                     f.write(bytes_data)  # write this content elsewhere
 
-            # parse the files and add to the splits collection
-            splits = []
-            for file in uploaded_docs:
-                with st.spinner('Loading...'):
-                    loader = PyPDFLoader(os.path.join("/tmp", file.name))
-                    docs = loader.load()
-                    # split the documents into chunks
-                    splits.extend(text_splitter.split_documents(docs))
-                    #TODO will eventually need to support multidocs
-                    
-            if splits:
-                # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
-                # create the vectorestore to use as the index
-                if 'vector_store' not in st.session_state:
-                    st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-                    # expose this index in a retriever interface
-                    retriever = st.session_state['vector_store'].as_retriever()
-                    # create a chain to answer questions 
-                    question_answer_chain = create_stuff_documents_chain(llm, prompt)
-                if 'rag_chain' not in st.session_state:
-                    st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
-
     st.write('Finished uploading...')
 
 def invoke_chain_callback():
@@ -124,7 +99,31 @@ with st.form(key='uploader'):
                              type=["pdf",],
                              accept_multiple_files=True)
 
-    uploader_button = st.form_submit_button(label='Process files', type="primary", on_click=upload_callback)
+    uploader_button = st.form_submit_button(label='Upload files', type="primary", on_click=upload_callback)
+
+if st.button('Process files'):
+    # parse the files and add to the splits collection
+    splits = []
+    for file in uploaded_docs:
+        with st.spinner('Loading...'):
+            loader = PyPDFLoader(os.path.join("/tmp", file.name))
+            docs = loader.load()
+            # split the documents into chunks
+            splits.extend(text_splitter.split_documents(docs))
+            #TODO will eventually need to support multidocs
+            
+    if splits:
+        # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
+        # create the vectorestore to use as the index
+        if 'vector_store' not in st.session_state:
+            st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+            # expose this index in a retriever interface
+            retriever = st.session_state['vector_store'].as_retriever()
+            # create a chain to answer questions 
+            question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        if 'rag_chain' not in st.session_state:
+            st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
+
 
 # check if chain is ready before letting user ask questions 
 asked = None   
@@ -133,58 +132,62 @@ if 'rag_chain' in st.session_state:
         question = st.write("Now ask a question about the documents!")
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
-        if asked:
-            st.rerun()                
-                
-@st.fragment()
-def render_pdf_pages():
-    if st.session_state['results']:
-        st.header('Answer:')
-        st.write(st.session_state['results']['answer'])
-        st.header("Sources:")
-        # source_pages = []
-        # files_names = []
-        file_to_pages = {}
-        source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
-        for idx, item in enumerate(st.session_state['results']['context']):
-            #st.subheader(source_list[idx])
-            fname = st.session_state['results']['context'][idx].metadata['source']
-            #st.write('File name: ' + fname)
-            page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-            #st.write('Page number: %d' % page_num)
-            #source_pages.append(page_num)
-            if fname not in file_to_pages:
-                file_to_pages[fname] = [page_num]
-            else:
-                file_to_pages[fname].append(page_num)
 
-        for k,v in file_to_pages.items():
-            with st.container():
-                st.header("File name: " + k)
-                with st.expander("See document source"):
-                    st.subheader("Relevant pages:")
-                    page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
-                    cols = st.columns(2)
-                    cols[0].markdown(page_str)
-                    cols[1].toggle("Refresh", key='toggle_'+k)
-                    pdf_viewer(k,
-                               width=900, 
-                               height=1400, 
-                               pages_to_render=v, #st.session_state['page_selection'],
-                               key='pdf_'+k)
 
-render_pdf_pages()
-                # @st.fragment
-                # def render_pdf_pages():
-                #     placeholder = st.empty()
-                #     if st.session_state['pages']:
-                #         st.session_state['page_selection'] = placeholder.multiselect(
-                #             "Select pages to display",
-                #             options=list(range(1, st.session_state['pages'] + 1)),
-                #             default=v,
-                #             help="The page number considered is the PDF number and not the document page number.",
-                #             disabled=not st.session_state['pages'],
-                #             key='page_selector_'+k
-                #         )
+def display_answer():
+    st.session_state.display_answer = True
 
-                #render_pdf_pages()
+st.button('Click me', on_click=display_answer)
+
+if st.session_state.display_answer:
+    @st.fragment()
+    def render_pdf_pages():
+        if st.session_state['results']:
+            st.header('Answer:')
+            st.write(st.session_state['results']['answer'])
+            st.header("Sources:")
+            # source_pages = []
+            # files_names = []
+            file_to_pages = {}
+            source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
+            for idx, item in enumerate(st.session_state['results']['context']):
+                #st.subheader(source_list[idx])
+                fname = st.session_state['results']['context'][idx].metadata['source']
+                #st.write('File name: ' + fname)
+                page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
+                #st.write('Page number: %d' % page_num)
+                #source_pages.append(page_num)
+                if fname not in file_to_pages:
+                    file_to_pages[fname] = [page_num]
+                else:
+                    file_to_pages[fname].append(page_num)
+
+            for k,v in file_to_pages.items():
+                with st.container():
+                    st.header("File name: " + k)
+                    with st.expander("See document source"):
+                        st.subheader("Relevant pages:")
+                        page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
+                        cols = st.columns(2)
+                        cols[0].markdown(page_str)
+                        cols[1].toggle("Refresh", key='toggle_'+k)
+                        pdf_viewer(k,
+                                   width=900, 
+                                   height=1400, 
+                                   pages_to_render=v, #st.session_state['page_selection'],
+                                   key='pdf_'+k)
+    render_pdf_pages()
+                    # @st.fragment
+                    # def render_pdf_pages():
+                    #     placeholder = st.empty()
+                    #     if st.session_state['pages']:
+                    #         st.session_state['page_selection'] = placeholder.multiselect(
+                    #             "Select pages to display",
+                    #             options=list(range(1, st.session_state['pages'] + 1)),
+                    #             default=v,
+                    #             help="The page number considered is the PDF number and not the document page number.",
+                    #             disabled=not st.session_state['pages'],
+                    #             key='page_selector_'+k
+                    #         )
+
+                    #render_pdf_pages()
