@@ -117,6 +117,7 @@ def invoke_chain_callback():
     with st.spinner('Thinking...'):
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
+        st.write(st.session_state['results']['answer'])
 
             
 with st.form(key='uploader'):
@@ -172,8 +173,6 @@ def render_pdf_pages():
                                key='pdf_'+k)
 
 render_pdf_pages()
-                    
-                    
                 # @st.fragment
                 # def render_pdf_pages():
                 #     placeholder = st.empty()
