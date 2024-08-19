@@ -165,7 +165,7 @@ if asked:
                 def render_pdf_pages(run_every="10s"):
                     cols = st.columns(2)
                     cols[0].markdown(page_str)
-                    cols[1].toggle("Refresh")
+                    cols[1].toggle("Refresh", key='toggle_'+k)
                     pdf_viewer(k,
                                width=900, 
                                height=1400, 
