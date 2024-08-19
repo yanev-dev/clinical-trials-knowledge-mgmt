@@ -74,6 +74,8 @@ if 'display_answer' not in st.session_state:
     st.session_state['display_answer'] = None
 
 
+#### Callbacks ####
+
 def upload_callback():
     with st.spinner('Loading...'):
         # clean up the state
@@ -95,6 +97,9 @@ def invoke_chain_callback():
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
             
+
+
+#### App code ####
 
 
 with st.form(key='uploader'):
@@ -133,7 +138,6 @@ if st.button('Process files'):
 
 
 # check if chain is ready before letting user ask questions 
-asked = None   
 if 'rag_chain' in st.session_state:
     with st.form(key="questions"):
         question = st.write("Now ask a question about the documents!")
