@@ -70,8 +70,8 @@ if 'vector_store' not in st.session_state:
 if 'rag_chain' not in st.session_state:
     st.session_state['rag_chain'] = None
 
-if 'display_answer' not in st.session_state:
-    st.session_state['display_answer'] = None
+if 'file_to_pages' not in st.session_state:
+    st.session_state['file_to_pages'] = None
 
 
 #### Callbacks ####
@@ -98,39 +98,41 @@ def invoke_chain_callback():
     st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
 
 
-@st.fragment()
-def render_pdf_pages():
+def display_answer():
     if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
         st.header("Sources:")
 
-        file_to_pages = {}
+        if st.session_state.file_to_pages is None:
+            st.session_state.file_to_pages = {}
         source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
         for idx, item in enumerate(st.session_state['results']['context']):
             fname = st.session_state['results']['context'][idx].metadata['source']
             page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-            if fname not in file_to_pages:
-                file_to_pages[fname] = [page_num]
+            if fname not in st.session_state.file_to_pages:
+                st.session_state.file_to_pages[fname] = [page_num]
             else:
-                file_to_pages[fname].append(page_num)
+                st.session_state.file_to_pages[fname].append(page_num)
 
-        for k,v in file_to_pages.items():
-            with st.container():
-                st.header("File name: " + k)
-                with st.expander("See document source"):
-                    st.subheader("Relevant pages:")
-                    page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
-                    cols = st.columns(2)
-                    cols[0].markdown(page_str)
-                    if cols[1].toggle("Refresh", key='toggle_'+k):
-                        st.rerun(scope="fragment")
-
-                    pdf_viewer(k,
-                               width=900, 
-                               height=1400, 
-                               pages_to_render=v, #st.session_state['page_selection'],
-                               key='pdf_'+k)
+st.fragment()
+def render_pdfs():
+    for k,v in st.session_state.file_to_pages.items():
+        with st.container():
+            st.header("File name: " + k)
+            with st.expander("See document source"):
+                st.subheader("Relevant pages:")
+                page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
+                cols = st.columns(2)
+                cols[0].markdown(page_str)
+                if cols[1].toggle("Refresh", key='toggle_'+k):
+                    st.rerun(scope='fragment')
+                
+                pdf_viewer(k,
+                           width=900, 
+                           height=1400, 
+                           pages_to_render=v, #st.session_state['page_selection'],
+                           key='pdf_'+k)
 
 #### App code ####
 
@@ -176,4 +178,5 @@ if 'rag_chain' in st.session_state:
         if asked:
             with st.spinner('Thinking...'):
                 st.write('Chain returned an answer...')
-                render_pdf_pages()
+                display_answer()
+                render_pdfs()
