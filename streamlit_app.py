@@ -146,6 +146,7 @@ if 'rag_chain' in st.session_state:
 
 def display_answer():
     st.session_state.display_answer = True
+    st.rerun()
 
 st.button('Display the answer', on_click=display_answer)
 
