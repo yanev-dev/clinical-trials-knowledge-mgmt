@@ -142,6 +142,7 @@ if 'rag_chain' in st.session_state:
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
         if asked:
             st.write('Chain returned an answer...')
+            st.rerun()
 
 
 def display_answer():
