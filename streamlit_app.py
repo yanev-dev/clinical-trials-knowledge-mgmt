@@ -73,6 +73,9 @@ if 'vector_store' not in st.session_state:
 if 'rag_chain' not in st.session_state:
     st.session_state['rag_chain'] = None
 
+if 'results' not in st.session_state:
+    st.session_state['results'] = None
+
 
 def upload_callback():
     with st.spinner('Processing...'):
@@ -136,7 +139,7 @@ if 'rag_chain' in st.session_state:
                 
 @st.fragment()
 def render_pdf_pages():
-    if asked:
+    if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
         st.header("Sources:")
