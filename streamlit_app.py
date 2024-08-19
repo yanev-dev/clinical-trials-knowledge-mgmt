@@ -78,10 +78,12 @@ if 'display_answer' not in st.session_state:
 
 def upload_callback():
     with st.spinner('Loading...'):
+
+        #TODO: find a better way to deal with duplicates
         # clean up the state
         # eg del the vector store and qachain if already intialized with prior doc set
-        for key in st.session_state.keys():
-            st.session_state[key] = None
+        # for key in st.session_state.keys():
+        #     st.session_state[key] = None
 
         if uploaded_docs is not None:
             # save uploaded files to disk
@@ -94,9 +96,7 @@ def upload_callback():
 
 def invoke_chain_callback():
     with st.spinner('Thinking...'):
-        st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
-        st.write('Chain returned an answer...')
-            
+        st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})            
 
 
 #### App code ####
@@ -119,12 +119,9 @@ if st.button('Process files'):
         for file in uploaded_docs:
             loader = PyPDFLoader(os.path.join("/tmp", file.name))
             docs = loader.load()
-            # split the documents into chunks
             splits.extend(text_splitter.split_documents(docs))
-            #TODO will eventually need to support multidocs
             
         if splits:
-            # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
             # create the vectorestore to use as the index
             if st.session_state.vector_store is None:
                 st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
@@ -143,6 +140,8 @@ if 'rag_chain' in st.session_state:
         question = st.write("Now ask a question about the documents!")
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
+        if asked:
+            st.write('Chain returned an answer...')
 
 
 def display_answer():
@@ -157,17 +156,12 @@ if st.session_state.display_answer:
             st.header('Answer:')
             st.write(st.session_state['results']['answer'])
             st.header("Sources:")
-            # source_pages = []
-            # files_names = []
+
             file_to_pages = {}
             source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
             for idx, item in enumerate(st.session_state['results']['context']):
-                #st.subheader(source_list[idx])
                 fname = st.session_state['results']['context'][idx].metadata['source']
-                #st.write('File name: ' + fname)
                 page_num = int(st.session_state['results']['context'][idx].metadata['page']) + 1
-                #st.write('Page number: %d' % page_num)
-                #source_pages.append(page_num)
                 if fname not in file_to_pages:
                     file_to_pages[fname] = [page_num]
                 else:
