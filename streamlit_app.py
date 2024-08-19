@@ -95,8 +95,7 @@ def upload_callback():
 
 
 def invoke_chain_callback():
-    with st.spinner('Thinking...'):
-        st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
+    st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
 
 
 @st.fragment()
@@ -124,13 +123,14 @@ def render_pdf_pages():
                     page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
                     cols = st.columns(2)
                     cols[0].markdown(page_str)
-                    cols[1].toggle("Refresh", key='toggle_'+k)
+                    if cols[1].toggle("Refresh", key='toggle_'+k):
+                        st.rerun(scope="fragment")
+
                     pdf_viewer(k,
                                width=900, 
                                height=1400, 
                                pages_to_render=v, #st.session_state['page_selection'],
                                key='pdf_'+k)
-        st.rerun()
 
 #### App code ####
 
@@ -174,5 +174,6 @@ if 'rag_chain' in st.session_state:
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
         if asked:
-            st.write('Chain returned an answer...')
-            render_pdf_pages()
+            with st.spinner('Thinking...'):
+                st.write('Chain returned an answer...')
+                render_pdf_pages()
