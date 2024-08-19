@@ -115,8 +115,7 @@ def display_answer():
             else:
                 st.session_state.file_to_pages[fname].append(page_num)
 
-st.fragment()
-def render_pdfs():
+def render_pdfs(rerun_every='10sec'):
     for k,v in st.session_state.file_to_pages.items():
         with st.container():
             st.header("File name: " + k)
@@ -125,9 +124,7 @@ def render_pdfs():
                 page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
                 cols = st.columns(2)
                 cols[0].markdown(page_str)
-                if cols[1].button("Refresh", key='refresh'+k):
-                    st.rerun(scope='fragment')
-                
+                # if cols[1].toggle("Refresh", key='refresh'+k):                
                 pdf_viewer(k,
                            width=900, 
                            height=1400, 
