@@ -89,8 +89,6 @@ def upload_callback():
                 with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
                     f.write(bytes_data)  # write this content elsewhere
 
-    st.write('Finished uploading...')
-
 def invoke_chain_callback():
     with st.spinner('Thinking...'):
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
@@ -103,29 +101,32 @@ with st.form(key='uploader'):
                              accept_multiple_files=True)
 
     uploader_button = st.form_submit_button(label='Upload files', type="primary", on_click=upload_callback)
+    if uploader_button:
+        st.write('Finished uploading...')
 
 if st.button('Process files'):
     # parse the files and add to the splits collection
     splits = []
-    for file in uploaded_docs:
-        with st.spinner('Processing...'):
+    with st.spinner('Processing...'):
+        for file in uploaded_docs:
             loader = PyPDFLoader(os.path.join("/tmp", file.name))
             docs = loader.load()
             # split the documents into chunks
             splits.extend(text_splitter.split_documents(docs))
             #TODO will eventually need to support multidocs
             
-    if splits:
-        # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
-        # create the vectorestore to use as the index
-        if 'vector_store' not in st.session_state:
-            st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-            # expose this index in a retriever interface
-            retriever = st.session_state['vector_store'].as_retriever()
-            # create a chain to answer questions 
-            question_answer_chain = create_stuff_documents_chain(llm, prompt)
-        if 'rag_chain' not in st.session_state:
-            st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
+        if splits:
+            # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
+            # create the vectorestore to use as the index
+            if 'vector_store' not in st.session_state:
+                st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+                # expose this index in a retriever interface
+                retriever = st.session_state['vector_store'].as_retriever()
+                # create a chain to answer questions 
+                question_answer_chain = create_stuff_documents_chain(llm, prompt)
+            if 'rag_chain' not in st.session_state:
+                st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
+    st.write('...VectorDB and LLM ready!')
 
 
 # check if chain is ready before letting user ask questions 
