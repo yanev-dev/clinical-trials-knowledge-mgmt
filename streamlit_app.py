@@ -135,7 +135,7 @@ if 'rag_chain' in st.session_state:
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)                
                 
 @st.fragment()
-def render_pdf_pages(run_every="10s"):
+def render_pdf_pages():
     if asked:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
@@ -162,8 +162,6 @@ def render_pdf_pages(run_every="10s"):
                 with st.expander("See document source"):
                     st.subheader("Relevant pages:")
                     page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
-
-
                     cols = st.columns(2)
                     cols[0].markdown(page_str)
                     cols[1].toggle("Refresh", key='toggle_'+k)
