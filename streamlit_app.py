@@ -118,8 +118,6 @@ def invoke_chain_callback():
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
         st.write(st.session_state['results']['answer'])
-        st.rerun()
-
             
 with st.form(key='uploader'):
     uploaded_docs = st.file_uploader('Upload trial documents in PDF format.',
@@ -134,7 +132,9 @@ if 'rag_chain' in st.session_state:
     with st.form(key="questions"):
         question = st.write("Now ask a question about the documents!")
         question = st.text_input('Question:')
-        asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)                
+        asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
+        if asked:
+            st.rerun()                
                 
 @st.fragment()
 def render_pdf_pages():
