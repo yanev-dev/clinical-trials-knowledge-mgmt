@@ -130,7 +130,7 @@ def render_pdfs(rerun_every='10sec'):
                            pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
                 if cols[1].toggle("Refresh", key='refresh'+k):
-                    st.rerun(scope='fragment')                    
+                    st.rerun                   
 
 #### App code ####
 
