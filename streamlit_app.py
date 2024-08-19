@@ -118,6 +118,7 @@ def invoke_chain_callback():
         st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
         st.write('Chain returned an answer...')
         st.write(st.session_state['results']['answer'])
+        st.rerun()
 
             
 with st.form(key='uploader'):
