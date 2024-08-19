@@ -64,8 +64,8 @@ prompt = ChatPromptTemplate.from_messages(
 # if 'pages' not in st.session_state:
 #     st.session_state['pages'] = None
 
-# if 'page_selection' not in st.session_state:
-#     st.session_state['page_selection'] = []
+if 'results' not in st.session_state:
+    st.session_state['results'] = None
 
 if 'vector_store' not in st.session_state:
     st.session_state['vector_store'] = None
@@ -136,7 +136,7 @@ if 'rag_chain' in st.session_state:
                 
 @st.fragment()
 def render_pdf_pages():
-    if asked:
+    if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
         st.header("Sources:")
