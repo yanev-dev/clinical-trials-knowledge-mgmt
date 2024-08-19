@@ -70,9 +70,12 @@ if 'vector_store' not in st.session_state:
 if 'rag_chain' not in st.session_state:
     st.session_state['rag_chain'] = None
 
+if 'display_answer' not in st.session_state:
+    st.session_state['display_answer'] = None
+
 
 def upload_callback():
-    with st.spinner('Processing...'):
+    with st.spinner('Loading...'):
         # clean up the state
         # eg del the vector store and qachain if already intialized with prior doc set
         for key in st.session_state.keys():
@@ -105,7 +108,7 @@ if st.button('Process files'):
     # parse the files and add to the splits collection
     splits = []
     for file in uploaded_docs:
-        with st.spinner('Loading...'):
+        with st.spinner('Processing...'):
             loader = PyPDFLoader(os.path.join("/tmp", file.name))
             docs = loader.load()
             # split the documents into chunks
@@ -137,7 +140,7 @@ if 'rag_chain' in st.session_state:
 def display_answer():
     st.session_state.display_answer = True
 
-st.button('Click me', on_click=display_answer)
+st.button('Display the answer', on_click=display_answer)
 
 if st.session_state.display_answer:
     @st.fragment()
