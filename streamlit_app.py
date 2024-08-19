@@ -104,8 +104,7 @@ def display_answer():
         st.write(st.session_state['results']['answer'])
         st.header("Sources:")
 
-        if st.session_state.file_to_pages is None:
-            st.session_state.file_to_pages = {}
+        st.session_state.file_to_pages = {}
         source_list = ['\nSource %s:' % str(idx+1) for idx,_ in enumerate(st.session_state['results']['context'])]                            
         for idx, item in enumerate(st.session_state['results']['context']):
             fname = st.session_state['results']['context'][idx].metadata['source']
