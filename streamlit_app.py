@@ -118,13 +118,13 @@ if st.button('Process files'):
         if splits:
             # st.session_state['pages'] = len(splits) #if not st.session_state['pages'] else st.session_state['pages']
             # create the vectorestore to use as the index
-            if 'vector_store' not in st.session_state:
+            if not st.session_state.vector_store:
                 st.session_state['vector_store'] = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
                 # expose this index in a retriever interface
                 retriever = st.session_state['vector_store'].as_retriever()
                 # create a chain to answer questions 
                 question_answer_chain = create_stuff_documents_chain(llm, prompt)
-            if 'rag_chain' not in st.session_state:
+            if not st.session_state.rag_chain:
                 st.session_state['rag_chain'] = create_retrieval_chain(retriever, question_answer_chain)
     st.write('...VectorDB and LLM ready!')
 
