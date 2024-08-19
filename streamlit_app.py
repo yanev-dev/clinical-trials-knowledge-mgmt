@@ -125,7 +125,7 @@ def render_pdfs():
                 page_str = ':green[' + ', '.join(str(x) for x in sorted(v)) + ']'
                 cols = st.columns(2)
                 cols[0].markdown(page_str)
-                if cols[1].toggle("Refresh", key='toggle_'+k):
+                if cols[1].button("Refresh", key='refresh'+k):
                     st.rerun(scope='fragment')
                 
                 pdf_viewer(k,
