@@ -120,7 +120,7 @@ def render_pdfs():
                     # st.rerun()  
 
     with st.container():
-        if st.toggle("Refresh", key='refresh'+k):
+        if st.toggle("Refresh", key='refresh'):
             st.rerun()  
         for k,v in st.session_state.file_to_pages.items():
             st.header("File name: " + k)
