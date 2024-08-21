@@ -178,5 +178,5 @@ if 'rag_chain' in st.session_state:
         if asked:
             with st.spinner('Thinking...'):
                 st.write('LLM returned an answer...!')
-                display_answer
+                display_answer()
                 render_pdfs()
