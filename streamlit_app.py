@@ -116,8 +116,13 @@ def invoke_chain_callback():
 
 @st.fragment
 def render_pdfs():
-    for k,v in st.session_state.file_to_pages.items():
-        with st.container():
+                    # if cols[1].toggle("Refresh", key='refresh'+k):
+                    # st.rerun()  
+
+    with st.container():
+        if st.toggle("Refresh", key='refresh'+k):
+            st.rerun()  
+        for k,v in st.session_state.file_to_pages.items():
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages:")
@@ -129,8 +134,7 @@ def render_pdfs():
                            height=1400, 
                            pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
-                #if cols[1].toggle("Refresh", key='refresh'+k):
-                    #st.rerun()                  
+                    
 #### App code ####
 
 
@@ -173,7 +177,6 @@ if 'rag_chain' in st.session_state:
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
         if asked:
-            st.rerun()
             with st.spinner('Thinking...'):
                 st.write('Chain returned an answer...')
                 render_pdfs()
