@@ -118,10 +118,10 @@ def display_answer():
 
 @st.fragment
 def render_pdfs():
-    with st.container():
-        if st.toggle("Refresh", key='refresh'):
-            st.rerun()  
-        for k,v in st.session_state.file_to_pages.items():
+    if st.toggle("Refresh", key='refresh'):
+        st.rerun()  
+    for k,v in st.session_state.file_to_pages.items():
+        with st.container():
             st.header("File name: " + k)
             with st.expander("See document source"):
                 st.subheader("Relevant pages:")
