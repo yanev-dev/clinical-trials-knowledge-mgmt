@@ -103,6 +103,7 @@ def invoke_chain_callback():
 
 
 def display_answer():
+    st.rerun()
     if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
@@ -117,10 +118,10 @@ def display_answer():
                 st.session_state.file_to_pages[fname] = [page_num]
             else:
                 st.session_state.file_to_pages[fname].append(page_num)
-        st.rerun()
 
 @st.fragment
 def render_pdfs():
+    st.rerun()                  
     for k,v in st.session_state.file_to_pages.items():
         with st.container():
             st.header("File name: " + k)
@@ -135,7 +136,6 @@ def render_pdfs():
                            pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
                 #if cols[1].toggle("Refresh", key='refresh'+k):
-                st.rerun()                  
 
 #### App code ####
 
