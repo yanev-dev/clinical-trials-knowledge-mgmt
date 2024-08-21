@@ -99,9 +99,6 @@ def upload_callback():
 
 def invoke_chain_callback():
     st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
-    st.session_state.update(st.session_state)
-
-def display_answer():
     if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
@@ -175,8 +172,8 @@ if 'rag_chain' in st.session_state:
         question = st.write("Now ask a question about the documents!")
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
+        st.rerun()
         if asked:
             with st.spinner('Thinking...'):
                 st.write('Chain returned an answer...')
-                display_answer()
                 render_pdfs()
