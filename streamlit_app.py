@@ -172,8 +172,8 @@ if 'rag_chain' in st.session_state:
         question = st.write("Now ask a question about the documents!")
         question = st.text_input('Question:')
         asked = st.form_submit_button("Ask", type="primary", on_click=invoke_chain_callback)
-        st.rerun()
         if asked:
+            st.rerun()
             with st.spinner('Thinking...'):
                 st.write('Chain returned an answer...')
                 render_pdfs()
