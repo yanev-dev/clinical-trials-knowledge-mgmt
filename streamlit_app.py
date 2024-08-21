@@ -103,7 +103,6 @@ def invoke_chain_callback():
 
 
 def display_answer():
-    st.rerun()
     if st.session_state['results']:
         st.header('Answer:')
         st.write(st.session_state['results']['answer'])
