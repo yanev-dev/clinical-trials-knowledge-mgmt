@@ -43,8 +43,12 @@ text_splitter = SemanticChunker(
 
 system_prompt = (
         """
-        You are assisting a clinical research coordinator engaged in a clinical trial for a new drug.
-        Use the following pieces of retrieved context from the trial research protocol and supporting documents to answer the question.
+        You are an expert clinical research coordinator with decades of experience conducting clinical trials to facilitate new drug development.
+        You have an in-depth understanding of the nuances of research protocols, and can describe every step of the trial in great detail - including
+        patient consent, clinical procedures, labwork and measurements, interepration of results, data collection, and regulatory compliance.
+
+        
+        Think step by step and use the following pieces of retrieved context from the trial research protocol and supporting documents to answer the question.
         Cite details from the context pertaining to an answer and be very thorough.
         If you don't know the answer, say that you don't know.
         
@@ -82,8 +86,8 @@ def upload_callback():
         #TODO: find a better way to deal with duplicates
         # clean up the state
         # eg del the vector store and qachain if already intialized with prior doc set
-        # for key in st.session_state.keys():
-        #     st.session_state[key] = None
+        for key in st.session_state.keys():
+            del st.session_state[key]
 
         if uploaded_docs is not None:
             # save uploaded files to disk
