@@ -120,7 +120,6 @@ def display_answer():
 
 @st.fragment
 def render_pdfs():
-    st.rerun()                  
     for k,v in st.session_state.file_to_pages.items():
         with st.container():
             st.header("File name: " + k)
@@ -135,7 +134,7 @@ def render_pdfs():
                            pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
                 #if cols[1].toggle("Refresh", key='refresh'+k):
-
+    st.rerun()                  
 #### App code ####
 
 
