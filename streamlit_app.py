@@ -97,10 +97,9 @@ def upload_callback():
                 with open(os.path.join("/tmp", uploaded_docs[i].name), "wb") as f:
                     f.write(bytes_data)  # write this content elsewhere
 
-
 def invoke_chain_callback():
     st.session_state['results'] = st.session_state['rag_chain'].invoke({"input": question})
-
+    st.session_state.update(st.session_state)
 
 def display_answer():
     if st.session_state['results']:
