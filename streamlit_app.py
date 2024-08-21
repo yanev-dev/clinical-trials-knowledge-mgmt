@@ -117,6 +117,7 @@ def display_answer():
                 st.session_state.file_to_pages[fname] = [page_num]
             else:
                 st.session_state.file_to_pages[fname].append(page_num)
+        st.rerun()
 
 @st.fragment
 def render_pdfs():
