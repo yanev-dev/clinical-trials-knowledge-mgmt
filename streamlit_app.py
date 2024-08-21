@@ -133,8 +133,8 @@ def render_pdfs():
                            height=1400, 
                            pages_to_render=v, #st.session_state['page_selection'],
                            key='pdf_'+k)
-                if cols[1].toggle("Refresh", key='refresh'+k):
-                    st.rerun()                  
+                #if cols[1].toggle("Refresh", key='refresh'+k):
+                st.rerun()                  
 
 #### App code ####
 
